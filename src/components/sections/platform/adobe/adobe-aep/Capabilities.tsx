@@ -10,25 +10,25 @@ const capabilities = [
     icon: Database,
     title: "Unify Your Data",
     description:
-      "Bring together data from CRM, eCommerce, marketing, sales, and support into one real-time customer profile. Break down the silos that cause inconsistent experiences, improve data accuracy, and give every team a trusted, AI-ready foundation to work from.",
+      "Bring together data from CRM, eCommerce, marketing, sales, and support into one real-time customer profile. Break down the silos that cause inconsistent experiences, improve data accuracy, and give every team a trusted, AI-ready foundation to work from. ",
   },
   {
     icon: Users,
     title: "Activate in real time",
     description:
-      "Turn insight into action the moment it matters. Use live customer data to reach the right person with the right message across web, mobile, email, and advertising — creating consistent experiences that deepen engagement and drive higher conversions.",
+      "Turn insight into action the moment it matters. Use live customer data to activate audiences across web, mobile, email, and advertising channels, reaching the right person with the right message at the right time. ",
   },
   {
     icon: GitMerge,
     title: "Personalize every journey",
     description:
-      "Go beyond reporting to prediction. Analyzing unified, real-time data surfaces patterns in customer behavior, sharpens targeting, and equips teams to make data-driven decisions that turn marketing spend into measurable ROI.",
+      "Every interaction is an opportunity. By tailoring each touchpoint using real-time insights, teams can create consistent, relevant experiences across channels that deepen engagement, build loyalty, and drive higher conversions. ",
   },
   {
     icon: BrainCircuit,
     title: "Predict with AI",
     description:
-      "Personalization and privacy aren't at odds; with the right controls, they reinforce each other. Built-in governance features protect sensitive data, support compliance with privacy regulations, and help build the customer trust that responsible personalization depends on.",
+      "Go beyond reporting to prediction. Analyzing unified, real-time data surfaces patterns in customer behavior, sharpens targeting, and equips teams to make data-driven decisions that turn marketing spend into measurable ROI. ",
   },
 ];
 

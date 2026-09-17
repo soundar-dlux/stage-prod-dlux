@@ -56,7 +56,7 @@ export interface ImageLRComponentsProps {
   imagePosition?: "left" | "right";
   /** 
    * Image position ordering on mobile screen size: "top" or "bottom"
-   * @default "top"
+   * @default "bottom"
    */
   mobileImagePosition?: "top" | "bottom";
   /** Primary call to action button */
@@ -94,7 +94,7 @@ export function ImageLRComponents({
   imageSrc = "/placeholder.jpg",
   imageAlt = "Image representation",
   imagePosition = "left",
-  mobileImagePosition = "top",
+  mobileImagePosition = "bottom",
   primaryCta,
   secondaryCta,
   customImage,

@@ -37,25 +37,25 @@ const defaultSteps: StepItem[] = [
     number: "01",
     title: "Discover",
     description:
-      "We start by understanding your business goals, customer journeys, existing data sources, and current technology environment, so the roadmap is grounded in where you actually are today, not a generic starting point.",
+      "We start by understanding your business goals, customer journeys, existing data sources, and current technology environment, so the roadmap is grounded in where you actually are today, not a generic starting point. ",
   },
   {
     number: "02",
     title: "Design",
     description:
-      "We define the data architecture, identity strategy, and governance model, along with a phased implementation roadmap, so every later decision has a solid foundation to build on.",
+      "We define the data architecture, identity strategy, and governance model, along with a phased implementation roadmap, so every later decision has a solid foundation to build on. ",
   },
   {
     number: "03",
     title: "Deliver",
     description:
-      "We implement the platform: integrations, unified customer profiles, audiences, and activation, tailored to whichever Adobe Experience Cloud applications are in scope for your business.",
+      "We implement the platform: integrations, unified customer profiles, audiences, and activation, tailored to whichever Adobe Experience Cloud applications are in scope for your business. ",
   },
   {
     number: "04",
     title: "Drive Value",
     description:
-      "Launch isn't the finish line. We support adoption, monitor performance, and continue optimising the platform so it keeps delivering value as your business evolves.",
+      "Launch isn't the finish line. We support adoption, monitor performance, and continue optimising the platform so it keeps delivering value as your business evolves. ",
   },
 ];
 
@@ -81,8 +81,8 @@ export function BringItToLifeSection({
   const safeImageSrc = imageSrc?.startsWith("http://")
     ? imageSrc.replace("http://", "https://")
     : imageSrc?.startsWith("//")
-    ? `https:${imageSrc}`
-    : imageSrc;
+      ? `https:${imageSrc}`
+      : imageSrc;
 
   return (
     <section

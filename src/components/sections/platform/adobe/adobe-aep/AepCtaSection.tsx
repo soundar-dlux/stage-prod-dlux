@@ -36,7 +36,7 @@ export function AepCtaSection({
       </span>
     </>
   ),
-  description = "Getting the AEP foundation right, identity, governance, and integration, determines whether it scales or needs rebuilding later. Our Implementation Guide breaks down the key decisions and execution steps to help you get there. Prefer to talk it through instead? Book a strategy session with our team.",
+  description = "Getting the AEP foundation right, identity, governance, andintegration, determines whether it scales or needs rebuilding later. Our Implementation Guide breaks down the key decisions and execution steps to help you get there. Prefer to talk it through instead? Book a strategy session with our team. ",
   primaryButtonText = "Implementation Guide",
   primaryButtonHref = "#implementation-guide",
   onPrimaryClick,

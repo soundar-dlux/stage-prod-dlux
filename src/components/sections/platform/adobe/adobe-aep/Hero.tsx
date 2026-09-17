@@ -9,7 +9,7 @@ const VIDEO_SRC =
 export default function HeroBanner() {
     return (
         <section className="relative w-full bg-white py-[40px] overflow-hidden font-sans">
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center">
+            <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 pt-[80px] flex flex-col items-center text-center">
                 {/* Main Headline */}
                 <motion.h1
                     initial={{ opacity: 0, y: 25 }}

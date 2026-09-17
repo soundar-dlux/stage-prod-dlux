@@ -83,13 +83,9 @@ export function WhyChooseDluxSection() {
           </h2>
 
           <p className="text-gray-500 text-sm sm:text-[15px] leading-relaxed font-normal max-w-3xl mx-auto">
-            Adobe Experience Platform is the foundation your customer experience
-            strategy is built on. Get the architecture, identity, and governance
-            right from the start, and it scales with you. Get it wrong, and it's
-            another disconnected system that needs to be rebuilt down the line. DLUX
-            Tech turns fragmented customer data into a governed foundation for
-            personalisation, analytics, and activation, across Real-Time CDP, Customer
-            Journey Analytics, Journey Optimizer, and GenStudio.
+            Adobe Experience Platform is the foundation your customer experience strategy is built on. Get the architecture, identity, and governance right from the start, and it scales with you. Get it wrong, and it's another disconnected system that needs to be rebuilt down the line. DLUX Tech turns
+            fragmented customer data into a governed foundation for personalisation, analytics, and activation, across
+            Real-Time CDP, Customer Journey Analytics, Journey Optimizer, and GenStudio.
           </p>
         </motion.div>
 

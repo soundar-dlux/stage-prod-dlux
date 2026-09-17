@@ -16,14 +16,14 @@ const solutions = [
     acronym: "AJO",
     title: "Adobe Journey Optimizer",
     description:
-      "Orchestrate personalized, cross-channel customer journeys in real time.",
+      "Orchestrate personalized, cross channel customer journeys in real time.",
     href: "/platform/adobe/adobe-aep/ajo",
   },
   {
     acronym: "CJA",
     title: "Customer Journey Analytics",
     description:
-      "Analyse omni channel customer behaviour with real-time, cross-channel reporting.",
+      "Analyse omni channel customer behaviour with real-time, cross-channel reporting.",
     href: "/platform/adobe/adobe-aep/cja",
   },
   {
