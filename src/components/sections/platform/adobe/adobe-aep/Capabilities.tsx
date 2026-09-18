@@ -1,31 +1,34 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Database, Users, GitMerge, BrainCircuit } from "lucide-react";
 import Image from "next/image";
 import React from "react";
 
 const capabilities = [
   {
-    icon: Database,
+    imageUrl:
+      "https://images.ctfassets.net/pj0maraabon4/UnRgbGU2gc6T4TOWWEzIE/5890a7568f1d20ca20385ddaaedc4715/Database.png",
     title: "Unify Your Data",
     description:
       "Bring together data from CRM, eCommerce, marketing, sales, and support into one real-time customer profile. Break down the silos that cause inconsistent experiences, improve data accuracy, and give every team a trusted, AI-ready foundation to work from. ",
   },
   {
-    icon: Users,
+    imageUrl:
+      "https://images.ctfassets.net/pj0maraabon4/7JyAxKvXuBsQczbFJGp6fJ/0acddb71aa0bd36249fcb758ede74289/group.png",
     title: "Activate in real time",
     description:
       "Turn insight into action the moment it matters. Use live customer data to activate audiences across web, mobile, email, and advertising channels, reaching the right person with the right message at the right time. ",
   },
   {
-    icon: GitMerge,
+    imageUrl:
+      "https://images.ctfassets.net/pj0maraabon4/1RZRsklAXcohhRt1R4GhJ7/b7c96cc5f72fecf61e20e300bae6e470/spiral.png",
     title: "Personalize every journey",
     description:
       "Every interaction is an opportunity. By tailoring each touchpoint using real-time insights, teams can create consistent, relevant experiences across channels that deepen engagement, build loyalty, and drive higher conversions. ",
   },
   {
-    icon: BrainCircuit,
+    imageUrl:
+      "https://images.ctfassets.net/pj0maraabon4/1MpAISDYfeLMtahDf8qRhE/514b02b28b973abcda15e0f3d1f8dab7/brain.png",
     title: "Predict with AI",
     description:
       "Go beyond reporting to prediction. Analyzing unified, real-time data surfaces patterns in customer behavior, sharpens targeting, and equips teams to make data-driven decisions that turn marketing spend into measurable ROI. ",
@@ -72,7 +75,6 @@ export function CapabilitiesSection() {
            ========================================================= */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10 mb-12 sm:mb-16">
           {capabilities.map((item, index) => {
-            const IconComponent = item.icon;
             return (
               <motion.div
                 key={index}
@@ -82,9 +84,14 @@ export function CapabilitiesSection() {
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 className="flex flex-col items-start"
               >
-                {/* Icon */}
-                <div className="mb-4 text-black">
-                  <IconComponent className="w-6 h-6 stroke-[2]" />
+                {/* Image */}
+                <div className="mb-4 relative flex items-center justify-center">
+                  <Image
+                    src={item.imageUrl}
+                    alt={item.title}
+                    width={24}
+                    height={24}
+                  />
                 </div>
 
                 {/* Title */}

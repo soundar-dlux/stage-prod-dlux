@@ -9,6 +9,7 @@ export interface SolutionCardProps {
   title: string;
   description: string;
   href?: string;
+  className?: string;
 }
 
 export const SolutionCard: React.FC<SolutionCardProps> = ({
@@ -16,13 +17,16 @@ export const SolutionCard: React.FC<SolutionCardProps> = ({
   title,
   description,
   href = "#",
+  className = "",
 }) => {
   return (
-    <div className="relative flex flex-col justify-between w-full bg-white rounded-[24px] border border-[#FF4F00]/30 p-7 sm:p-8 shadow-lg shadow-[#FF4F00]/5 transition-all duration-300 hover:shadow-xl hover:shadow-[#FF4F00]/10 hover:-translate-y-1.5">
+    <div
+      className={`relative flex flex-col justify-between w-full max-w-[400px] min-h-[350px] bg-white rounded-[20px] border-[3px] border-transparent [background-image:linear-gradient(#ffffff,#ffffff),linear-gradient(131.12deg,#FFFFFF_-0.61%,#E13207_126.86%)] [background-origin:border-box] [background-clip:padding-box,border-box] p-6 sm:pt-[30px] sm:pr-[40px] sm:pb-[30px] sm:pl-[40px] shadow-lg shadow-[#FF4F00]/5 transition-all duration-300 hover:shadow-xl hover:shadow-[#FF4F00]/10 flex-shrink-0 box-border ${className}`}
+    >
       <div>
         {/* Top Header Row: Acronym & 4-Dot Constellation Graphic */}
         <div className="flex items-start justify-between mb-4">
-          <h3 className="text-3xl sm:text-4xl font-extrabold text-[#FF4F00] tracking-tight">
+          <h3 className="text-2xl sm:text-[32px] font-extrabold text-[#FF4F00] tracking-tight uppercase">
             {acronym}
           </h3>
 
@@ -36,12 +40,12 @@ export const SolutionCard: React.FC<SolutionCardProps> = ({
         </div>
 
         {/* Full Title */}
-        <h4 className="text-xl sm:text-2xl font-bold text-black leading-snug mb-4">
+        <h4 className="text-xl sm:text-[24px] font-bold text-black leading-snug mb-3">
           {title}
         </h4>
 
         {/* Description Paragraph */}
-        <p className="text-gray-500 text-sm sm:text-base leading-relaxed mb-8">
+        <p className="text-[#666666] text-xs sm:text-[14px] leading-relaxed mb-6 font-normal">
           {description}
         </p>
       </div>

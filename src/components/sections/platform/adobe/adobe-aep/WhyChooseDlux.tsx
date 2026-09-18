@@ -2,15 +2,16 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import ImageLRComponents from "@/src/components/ui/WB-Components/imageLRComponenets";
 
 export interface TabItem {
   id: string;
   label: string;
   heading: string;
   description: string;
-  leftBoxText?: string;
-  rightBoxText?: string;
-  bottomText?: string;
+  imageSrc: string;
+  highlights?: string[];
+  badge?: string;
 }
 
 const tabsData: TabItem[] = [
@@ -18,41 +19,41 @@ const tabsData: TabItem[] = [
     id: "partner",
     label: "Adobe Solution Partner",
     heading: "Adobe Solution Partner",
+    imageSrc:
+      "https://images.ctfassets.net/pj0maraabon4/7cNc58046Nf6MHPlIYzOAt/a9713b1dddc92cb0a087ad01b55688ea/Adobe_Solution-partner.png",
     description:
       "We help organisations unlock the full value of Adobe Experience Cloud through consulting, implementation, and optimisation, backed by Adobe's own best practices.",
-    leftBoxText: "Consulting/\nImplementation",
-    rightBoxText: "Continuous\nOptimisation",
-    bottomText: "Adobe Experience Cloud",
+
   },
   {
     id: "engineers",
     label: "Certified Adobe Engineers",
     heading: "Certified Adobe Engineers",
+    imageSrc:
+      "https://images.ctfassets.net/pj0maraabon4/5mprZ5Ku7rgfi5x9OokTDO/7e12606d7ff05ff8cd059ab449b88de1/Certified_Adobe_Engineers-orange.png",
     description:
       "Our team of certified Adobe architects and engineers bring deep domain expertise across AEP, RT-CDP, CJA, AJO, and Target to guarantee production-ready enterprise performance.",
-    leftBoxText: "Architects &\nEngineers",
-    rightBoxText: "Certified\nExcellence",
-    bottomText: "Adobe Certified Teams",
+
   },
   {
     id: "experience",
     label: "Enterprise Delivery Experience",
     heading: "Enterprise Delivery Experience",
+    imageSrc:
+      "https://images.ctfassets.net/pj0maraabon4/7Hot6WUFrjY4UKLnsuncaW/6c7ab086d58be357b6f28ea826c840f2/Enterprise_Delivery_Experience.png",
     description:
       "Proven track record delivering complex digital experience transformations for global enterprise clients, ensuring seamless integration, strict governance, and rapid time-to-value.",
-    leftBoxText: "Global\nScale",
-    rightBoxText: "Governed\nDelivery",
-    bottomText: "Enterprise Strategy",
+
   },
   {
     id: "delivery",
     label: "Engineering-Led Delivery",
     heading: "Engineering-Led Delivery",
+    imageSrc:
+      "https://images.ctfassets.net/pj0maraabon4/7i18XzsQkgsCyZi4xF8mi1/7c271cc5af60e3a86f500cf30fbaca40/Engineering-Led_Delivery.png",
     description:
       "We combine strategic vision with hands-on technical execution — building robust data pipelines, scalable architectures, and custom integrations tailored to your tech stack.",
-    leftBoxText: "Scalable\nPipelines",
-    rightBoxText: "Agile\nExecution",
-    bottomText: "Engineering First",
+
   },
 ];
 
@@ -83,9 +84,9 @@ export function WhyChooseDluxSection() {
           </h2>
 
           <p className="text-gray-500 text-sm sm:text-[15px] leading-relaxed font-normal max-w-3xl mx-auto">
-            Adobe Experience Platform is the foundation your customer experience strategy is built on. Get the architecture, identity, and governance right from the start, and it scales with you. Get it wrong, and it's another disconnected system that needs to be rebuilt down the line. DLUX Tech turns
+            Adobe Experience Platform is the foundation your customer experience strategy is built on. Get the architecture, identity, and governance right from the start, and it scales with you. Get it wrong, and it's another disconnected system that needs to be rebuilt down the line. DLUX Tech turns
             fragmented customer data into a governed foundation for personalisation, analytics, and activation, across
-            Real-Time CDP, Customer Journey Analytics, Journey Optimizer, and GenStudio.
+            Real-Time CDP, Customer Journey Analytics, Journey Optimizer, and GenStudio.
           </p>
         </motion.div>
 
@@ -151,7 +152,7 @@ export function WhyChooseDluxSection() {
         </div>
 
         {/* =========================================================
-            TAB CONTENT PANEL
+            TAB CONTENT PANEL (using ImageLRComponents with Simple White BG)
            ========================================================= */}
         <AnimatePresence mode="wait">
           <motion.div
@@ -160,91 +161,31 @@ export function WhyChooseDluxSection() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -15 }}
             transition={{ duration: 0.35, ease: "easeOut" }}
-            className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center max-w-6xl mx-auto"
+            className="w-full max-w-6xl mx-auto bg-white"
           >
-            {/* 🔹 LEFT COLUMN: ADOBE LOCK DIAGRAM */}
-            <div className="col-span-1 lg:col-span-6 flex flex-col items-center justify-center">
-              <div className="flex items-center justify-center gap-3 sm:gap-5">
-                {/* Left Box: Consulting / Implementation */}
-                <motion.div
-                  whileHover={{ scale: 1.04 }}
-                  className="w-[110px] sm:w-[130px] h-[95px] sm:h-[110px] rounded-[18px] bg-gradient-to-br from-[#FE780C] to-[#FE3908] text-white flex items-center justify-center p-3 text-center text-xs sm:text-sm font-bold shadow-md leading-snug select-none"
+            <ImageLRComponents
+              title={
+                <span
+                  style={{
+                    background: "linear-gradient(90deg, #FE780C 0%, #FE3908 100%)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                  }}
+                  className="font-extrabold inline-block"
                 >
-                  <span className="whitespace-pre-line">
-                    {currentTab.leftBoxText}
-                  </span>
-                </motion.div>
-
-                {/* Center Graphic: Red Adobe Lock Icon */}
-                <div className="flex flex-col items-center">
-                  <div className="relative flex flex-col items-center">
-                    {/* Red Lock Top Shackle */}
-                    <svg
-                      width="80"
-                      height="50"
-                      viewBox="0 0 80 50"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="mb-[-8px] text-[#E32319]"
-                    >
-                      <path
-                        d="M16 50V25C16 11.7452 26.7452 1 40 1C53.2548 1 64 11.7452 64 25V36"
-                        stroke="currentColor"
-                        strokeWidth="13"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-
-                    {/* Red Lock Main Body with Adobe Logo */}
-                    <div className="w-[125px] sm:w-[145px] h-[105px] sm:h-[120px] rounded-[22px] bg-[#E32319] shadow-lg flex items-center justify-center p-4">
-                      {/* Official White Adobe 'A' Vector Logo */}
-                      <svg
-                        width="52"
-                        height="44"
-                        viewBox="0 0 48 42"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M19.4 0H0V42L19.4 0Z" fill="white" />
-                        <path d="M28.6 0H48V42L28.6 0Z" fill="white" />
-                        <path
-                          d="M14.2 24.2H33.8L24 0L14.2 24.2ZM24 15.6L28.4 26.6H19.6L24 15.6Z"
-                          fill="white"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Right Box: Continuous Optimisation */}
-                <motion.div
-                  whileHover={{ scale: 1.04 }}
-                  className="w-[110px] sm:w-[130px] h-[95px] sm:h-[110px] rounded-[18px] bg-gradient-to-br from-[#FE780C] to-[#FE3908] text-white flex items-center justify-center p-3 text-center text-xs sm:text-sm font-bold shadow-md leading-snug select-none"
-                >
-                  <span className="whitespace-pre-line">
-                    {currentTab.rightBoxText}
-                  </span>
-                </motion.div>
-              </div>
-
-              {/* Text Underneath Diagram */}
-              {currentTab.bottomText && (
-                <h4 className="text-[#FF4F00] font-extrabold text-base sm:text-lg tracking-tight mt-4 text-center">
-                  {currentTab.bottomText}
-                </h4>
-              )}
-            </div>
-
-            {/* 🔹 RIGHT COLUMN: HEADING & DESCRIPTION */}
-            <div className="col-span-1 lg:col-span-6 flex flex-col justify-center text-center lg:text-left">
-              <h3 className="text-[#FF4F00] font-extrabold text-2xl sm:text-3xl lg:text-[34px] tracking-tight leading-tight mb-4">
-                {currentTab.heading}
-              </h3>
-
-              <p className="text-gray-600 text-sm sm:text-base leading-relaxed font-normal">
-                {currentTab.description}
-              </p>
-            </div>
+                  {currentTab.heading}
+                </span>
+              }
+              badge={currentTab.badge}
+              description={currentTab.description}
+              features={currentTab.highlights}
+              bgVariant="white"
+              imagePosition="left"
+              imageSrc={currentTab.imageSrc}
+              imageAlt={currentTab.heading}
+              disableImageHover={true}
+              className="py-0 px-0 bg-white [&_img]:!transform-none [&_img]:!scale-100"
+            />
           </motion.div>
         </AnimatePresence>
       </div>

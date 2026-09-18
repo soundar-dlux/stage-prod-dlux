@@ -81,6 +81,8 @@ export interface ImageLRComponentsProps {
   gridRatio?: "6-6" | "5-7" | "7-5";
   /** Optional interactive extra content below features */
   children?: React.ReactNode;
+  /** Disable image zoom/scale hover effect (default: false) */
+  disableImageHover?: boolean;
 }
 
 export function ImageLRComponents({
@@ -106,6 +108,7 @@ export function ImageLRComponents({
   className = "",
   gridRatio = "6-6",
   children,
+  disableImageHover = false,
 }: ImageLRComponentsProps) {
   // Animation variants
   const fastEase: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -266,7 +269,9 @@ export function ImageLRComponents({
                       alt={imageAlt}
                       fill
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 50vw"
-                      className="object-cover object-center transform group-hover:scale-105 transition-transform duration-700 ease-out"
+                      className={`object-cover object-center transform transition-transform duration-700 ease-out ${
+                        disableImageHover ? "" : "group-hover:scale-105"
+                      }`}
                       priority={false}
                     />
 
@@ -290,7 +295,9 @@ export function ImageLRComponents({
                       width={imageWidth || 1200}
                       height={imageHeight || 800}
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 50vw"
-                      className="w-full h-auto object-contain object-center transform group-hover:scale-[1.02] transition-transform duration-700 ease-out rounded-2xl sm:rounded-3xl"
+                      className={`w-full h-auto object-contain object-center transform transition-transform duration-700 ease-out rounded-2xl sm:rounded-3xl ${
+                        disableImageHover ? "" : "group-hover:scale-[1.02]"
+                      }`}
                       priority={false}
                     />
                   </div>

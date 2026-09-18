@@ -97,9 +97,8 @@ export function tempNav() {
   const getLinkClass = (href: string) => {
     const isActive = pathname === href;
 
-    return `relative transition-colors duration-200 font-medium px-1 py-1 block ${
-      isActive ? "text-[#FF3901]" : "text-gray-200 hover:text-[#FF3901]"
-    }`;
+    return `relative transition-colors duration-200 font-medium px-1 py-1 block ${isActive ? "text-[#FF3901]" : "text-gray-200 hover:text-[#FF3901]"
+      }`;
   };
 
   return (
@@ -107,7 +106,7 @@ export function tempNav() {
       {/* =================================================== */}
       {/* 🔹 SIMPLE FIXED STATIC HEADER                       */}
       {/* =================================================== */}
-      <header className="fixed top-0 left-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-white/10">
+      <header className="top-0 left-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           {/* LOGO */}
           <Link href="/" className="flex items-center">
@@ -137,11 +136,10 @@ export function tempNav() {
 
                         {/* Active / Hover Underline */}
                         <span
-                          className={`absolute left-0 -bottom-1 h-[2px] w-full bg-[#FF3901] transform transition-transform duration-200 origin-left ${
-                            pathname === baseHref
+                          className={`absolute left-0 -bottom-1 h-[2px] w-full bg-[#FF3901] transform transition-transform duration-200 origin-left ${pathname === baseHref
                               ? "scale-x-100"
                               : "scale-x-0 group-hover:scale-x-100"
-                          }`}
+                            }`}
                         />
                       </span>
                     </Link>
@@ -159,11 +157,10 @@ export function tempNav() {
                               <div key={i} className="relative group/sub">
                                 <Link
                                   href={subHref}
-                                  className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${
-                                    pathname === subHref
+                                  className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors ${pathname === subHref
                                       ? "text-[#FF3901] bg-white/5 font-semibold"
                                       : "text-gray-300 hover:text-[#FF3901] hover:bg-white/5"
-                                  }`}
+                                    }`}
                                 >
                                   <span>{subItem.title}</span>
 
@@ -187,11 +184,10 @@ export function tempNav() {
                                           <Link
                                             key={j}
                                             href={deepHref}
-                                            className={`block px-3 py-2 rounded-lg text-sm transition-colors ${
-                                              pathname === deepHref
+                                            className={`block px-3 py-2 rounded-lg text-sm transition-colors ${pathname === deepHref
                                                 ? "text-[#FF3901] bg-white/5 font-semibold"
                                                 : "text-gray-300 hover:text-[#FF3901] hover:bg-white/5"
-                                            }`}
+                                              }`}
                                           >
                                             {deep}
                                           </Link>
@@ -281,11 +277,10 @@ export function tempNav() {
                       <Link
                         href={baseHref}
                         onClick={() => setOpen(false)}
-                        className={`text-xl font-bold tracking-tight transition-colors ${
-                          pathname === baseHref
+                        className={`text-xl font-bold tracking-tight transition-colors ${pathname === baseHref
                             ? "text-[#FF3901]"
                             : "text-white hover:text-[#FF3901]"
-                        }`}
+                          }`}
                       >
                         {item}
                       </Link>
@@ -329,11 +324,10 @@ export function tempNav() {
                                   <Link
                                     href={subHref}
                                     onClick={() => setOpen(false)}
-                                    className={`text-base font-medium transition-colors ${
-                                      pathname === subHref
+                                    className={`text-base font-medium transition-colors ${pathname === subHref
                                         ? "text-[#FF3901]"
                                         : "text-neutral-300 hover:text-white"
-                                    }`}
+                                      }`}
                                   >
                                     {subItem.title}
                                   </Link>
@@ -379,11 +373,10 @@ export function tempNav() {
                                             key={deep}
                                             href={deepHref}
                                             onClick={() => setOpen(false)}
-                                            className={`text-sm transition-colors py-1 ${
-                                              pathname === deepHref
+                                            className={`text-sm transition-colors py-1 ${pathname === deepHref
                                                 ? "text-[#FF3901] font-medium"
                                                 : "text-neutral-400 hover:text-white"
-                                            }`}
+                                              }`}
                                           >
                                             {deep}
                                           </Link>

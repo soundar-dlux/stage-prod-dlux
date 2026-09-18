@@ -13,37 +13,32 @@ const defaultFaqs: FaqItem[] = [
   {
     question: "What is Adobe Experience Platform?",
     answer:
-      "Adobe Experience Platform is an enterprise platform that unifies customer data, builds real-time customer profiles, and enables personalized experiences across multiple channels.",
+      "Adobe Experience Platform is an enterprise platform that unifies customer data, builds real-time customer profiles, and enables personalized experiences across multiple channels. ",
   },
   {
-    question: "How does AEP differ from a traditional CDP?",
+    question: "Can AEP integrate with existing systems?",
     answer:
-      "Unlike traditional CDPs that only aggregate static data, AEP offers real-time streaming ingestion, AI-driven predictive insights via Data Science Workspace, robust data governance, and native activation across Adobe Journey Optimizer and Target.",
+      "Yes. Adobe Experience Platform integrates with CRM platforms, analytics tools, Adobe Experience Cloud applications, APIs, cloud storage, and enterprise business systems.",
   },
   {
-    question: "What applications are built on Adobe Experience Platform?",
+    question: "Does DLUX Tech provide implementation services?",
     answer:
-      "AEP powers core enterprise solutions including Real-Time Customer Data Platform (RT-CDP), Adobe Journey Optimizer (AJO), Customer Journey Analytics (CJA), and Adobe Target.",
+      "Yes. We offer end-to-end Adobe Experience Platform consulting, implementation, integration, optimization, and managed services for enterprise organizations. ",
   },
   {
-    question: "How does Real-Time CDP ensure data governance and privacy?",
+    question: "How long does an AEP implementation typically take?",
     answer:
-      "RT-CDP features a built-in Data Usage Labeling and Enforcement (DULE) framework, enabling automated policy enforcement, privacy compliance (GDPR, CCPA), and real-time consent management across all channels.",
+      "Most AEP implementations take 3–6 months. Smaller projects may finish in 6–12 weeks, while complex enterprise deployments can take 6–12+ months. ",
   },
   {
-    question: "Can Adobe Experience Platform integrate with non-Adobe systems?",
+    question: "Does AEP require other Adobe Experience Cloud products to work?",
     answer:
-      "Yes. AEP provides open REST APIs, streaming endpoints, and over 100 pre-built connectors to seamlessly ingest and activate data across CRM, ERP, data warehouses (Snowflake, BigQuery), mobile apps, and ad platforms.",
+      "No. AEP works independently but integrating it with products like Real-Time CDP or Journey Optimizer adds advanced personalization and activation capabilities.",
   },
   {
-    question: "What is Customer Journey Analytics (CJA) and how does it work with AEP?",
+    question: "How is AEP different from a traditional CDP?",
     answer:
-      "CJA connects directly to the unified data lake in AEP, enabling analysts to stitch online and offline customer touchpoints using Analysis Workspace without complex SQL queries.",
-  },
-  {
-    question: "How long does a typical AEP implementation take with DLUX Tech?",
-    answer:
-      "Implementation timelines vary depending on scope, but our phased delivery model enables initial real-time profile ingestion and first audience activation within 8 to 12 weeks.",
+      "A traditional CDP unifies customer data. AEP goes further with real-time profiles, AI, data governance, and enterprise-scale integrations for end-to-end customer experiences. ",
   },
 ];
 

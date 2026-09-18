@@ -50,9 +50,9 @@ export function AepCtaSection({
       style={{
         background: "linear-gradient(182.02deg, #000000 1.7%, #FE3908 221.82%)",
       }}
-      className={`w-full py-[40px] px-4 sm:px-6 lg:px-8 text-white text-center font-sans overflow-hidden relative ${className}`}
+      className={`w-full min-h-[504px] pt-[80px] pb-[80px] px-4 sm:px-8 lg:pt-[80px] lg:pr-[80px] lg:pb-[80px] lg:pl-[81px] text-white text-center font-sans overflow-hidden relative opacity-100 flex flex-col justify-center items-center ${className}`}
     >
-      <div className="max-w-5xl mx-auto relative z-10 flex flex-col items-center">
+      <div className="max-w-5xl mx-auto relative z-10 flex flex-col items-center gap-[10px]">
         {/* =========================================================
             HEADING
            ========================================================= */}
@@ -61,7 +61,7 @@ export function AepCtaSection({
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-3xl sm:text-4xl md:text-5xl lg:text-[50px] font-extrabold tracking-tight text-white leading-tight mb-6"
+          className="text-3xl sm:text-4xl md:text-5xl lg:text-[50px] font-extrabold tracking-tight text-white leading-tight mb-4"
         >
           {title}
         </motion.h2>
@@ -74,7 +74,7 @@ export function AepCtaSection({
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="text-white/85 text-sm sm:text-base leading-relaxed max-w-3xl mx-auto mb-10 font-normal"
+          className="text-white/85 text-sm sm:text-base leading-relaxed max-w-3xl mx-auto mb-6 font-normal"
         >
           {description}
         </motion.p>
@@ -87,7 +87,7 @@ export function AepCtaSection({
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="flex flex-wrap items-center justify-center gap-4 sm:gap-6"
+          className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mt-2"
         >
           {/* White Button: Implementation Guide */}
           <motion.a
