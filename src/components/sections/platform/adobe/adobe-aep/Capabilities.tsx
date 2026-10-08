@@ -47,7 +47,7 @@ export function CapabilitiesSection() {
             <span className="text-xs uppercase tracking-widest font-semibold text-[#FF4F00] block mb-2">
               Benefits
             </span>
-            <h2 className="text-3xl sm:text-4xl lg:text-[44px] font-extrabold tracking-tight text-black leading-tight">
+            <h2 className="text-3xl sm:text-4xl lg:text-[44px] font-extrabold tracking-tight text-black lg:leading-tight">
               <span className="text-[#FF4F00]">AEP</span> Capabilities
             </h2>
             <p className="mt-3 text-gray-500 text-sm sm:text-base max-w-xl">

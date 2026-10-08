@@ -1,8 +1,12 @@
 "use client";
 
-import React from "react";
+import Link from "next/link";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowDownCircle, PhoneCall } from "lucide-react";
+import { AEPCTAForm } from "@/src/components/WB-Component/Forms/AEPCTAForm";
+
+const MotionLink = motion.create(Link);
 
 export interface AepCtaSectionProps {
   /** Main section title (supports JSX for dual-color) */
@@ -36,98 +40,126 @@ export function AepCtaSection({
       </span>
     </>
   ),
-  description = "Getting the AEP foundation right, identity, governance, andintegration, determines whether it scales or needs rebuilding later. Our Implementation Guide breaks down the key decisions and execution steps to help you get there. Prefer to talk it through instead? Book a strategy session with our team. ",
+  description = "Getting the AEP foundation right, identity, governance, and integration, determines whether it scales or needs rebuilding later. Our Implementation Guide breaks down the key decisions and execution steps to help you get there. Prefer to talk it through instead? Book a strategy session with our team.",
   primaryButtonText = "Implementation Guide",
   primaryButtonHref = "#implementation-guide",
   onPrimaryClick,
   secondaryButtonText = "Book a Strategy Session",
-  secondaryButtonHref = "#strategy-session",
+  secondaryButtonHref = "/contact-us",
   onSecondaryClick,
   className = "",
 }: AepCtaSectionProps) {
+  const [isFormOpen, setIsFormOpen] = useState(false);
+
+  const handlePrimaryClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (onPrimaryClick) {
+      onPrimaryClick();
+    } else {
+      e.preventDefault();
+      setIsFormOpen(true);
+    }
+  };
+
+  const handleSecondaryClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (onSecondaryClick) {
+      onSecondaryClick();
+    }
+    // Allow natural navigation to secondaryButtonHref (/contact-us)
+  };
+
   return (
-    <section
-      style={{
-        background: "linear-gradient(182.02deg, #000000 1.7%, #FE3908 221.82%)",
-      }}
-      className={`w-full min-h-[504px] pt-[80px] pb-[80px] px-4 sm:px-8 lg:pt-[80px] lg:pr-[80px] lg:pb-[80px] lg:pl-[81px] text-white text-center font-sans overflow-hidden relative opacity-100 flex flex-col justify-center items-center ${className}`}
-    >
-      <div className="max-w-5xl mx-auto relative z-10 flex flex-col items-center gap-[10px]">
-        {/* =========================================================
-            HEADING
-           ========================================================= */}
-        <motion.h2
-          initial={{ opacity: 0, y: 25 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-3xl sm:text-4xl md:text-5xl lg:text-[50px] font-extrabold tracking-tight text-white leading-tight mb-4"
-        >
-          {title}
-        </motion.h2>
-
-        {/* =========================================================
-            DESCRIPTION PARAGRAPH
-           ========================================================= */}
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="text-white/85 text-sm sm:text-base leading-relaxed max-w-3xl mx-auto mb-6 font-normal"
-        >
-          {description}
-        </motion.p>
-
-        {/* =========================================================
-            CTA BUTTONS ROW
-           ========================================================= */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mt-2"
-        >
-          {/* White Button: Implementation Guide */}
-          <motion.a
-            href={primaryButtonHref}
-            onClick={onPrimaryClick}
-            whileHover={{ scale: 1.04 }}
-            whileTap={{ scale: 0.96 }}
-            className="
-              inline-flex items-center gap-3
-              bg-white text-[#FE3908] font-bold text-sm sm:text-base
-              px-7 py-3.5 rounded-full
-              shadow-lg shadow-black/20 hover:shadow-xl
-              transition-all duration-300 cursor-pointer select-none no-underline
-            "
+    <>
+      <section
+        style={{
+          background: "linear-gradient(182.02deg, #000000 1.7%, #FE3908 221.82%)",
+        }}
+        className={`w-full min-h-[504px] pt-[80px] pb-[80px] px-4 sm:px-8 lg:pt-[80px] lg:pr-[80px] lg:pb-[80px] lg:pl-[81px] text-white text-center font-sans overflow-hidden relative opacity-100 flex flex-col justify-center items-center ${className}`}
+      >
+        <div className="max-w-5xl mx-auto relative z-10 flex flex-col items-center gap-[10px]">
+          {/* =========================================================
+              HEADING
+             ========================================================= */}
+          <motion.h2
+            initial={{ opacity: 0, y: 25 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-[50px] font-extrabold tracking-tight text-white lg:leading-tight mb-4"
           >
-            <ArrowDownCircle className="w-5 h-5 text-[#FE3908] stroke-[2.2]" />
-            <span>{primaryButtonText}</span>
-          </motion.a>
+            {title}
+          </motion.h2>
 
-          {/* Orange Button: Book a Strategy Session */}
-          <motion.a
-            href={secondaryButtonHref}
-            onClick={onSecondaryClick}
-            whileHover={{ scale: 1.04 }}
-            whileTap={{ scale: 0.96 }}
-            className="
-              inline-flex items-center gap-3
-              bg-gradient-to-r from-[#FE780C] to-[#FE3908] text-white font-bold text-sm sm:text-base
-              px-7 py-3.5 rounded-full
-              shadow-lg shadow-[#FE3908]/30 hover:shadow-xl hover:shadow-[#FE3908]/50
-              transition-all duration-300 cursor-pointer select-none no-underline
-            "
+          {/* =========================================================
+              DESCRIPTION PARAGRAPH
+             ========================================================= */}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="text-white/85 text-sm sm:text-base leading-relaxed max-w-3xl mx-auto mb-6 font-normal"
           >
-            <PhoneCall className="w-5 h-5 text-white stroke-[2.2]" />
-            <span>{secondaryButtonText}</span>
-          </motion.a>
-        </motion.div>
-      </div>
-    </section>
+            {description}
+          </motion.p>
+
+          {/* =========================================================
+              CTA BUTTONS ROW
+             ========================================================= */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mt-2"
+          >
+            {/* White Button: Implementation Guide */}
+            <motion.a
+              href={primaryButtonHref}
+              onClick={handlePrimaryClick}
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.96 }}
+              className="
+                inline-flex items-center gap-3
+                bg-white text-[#FE3908] font-bold text-sm sm:text-base
+                px-7 py-3.5 rounded-full
+                shadow-lg shadow-black/20 hover:shadow-xl
+                transition-all duration-300 cursor-pointer select-none no-underline
+              "
+            >
+              <ArrowDownCircle className="w-5 h-5 text-[#FE3908] stroke-[2.2]" />
+              <span>{primaryButtonText}</span>
+            </motion.a>
+
+            {/* Orange Button: Book a Strategy Session */}
+            <MotionLink
+              href={secondaryButtonHref}
+              onClick={handleSecondaryClick}
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.96 }}
+              className="
+                inline-flex items-center gap-3
+                bg-gradient-to-r from-[#FE780C] to-[#FE3908] text-white font-bold text-sm sm:text-base
+                px-7 py-3.5 rounded-full
+                shadow-lg shadow-[#FE3908]/30 hover:shadow-xl hover:shadow-[#FE3908]/50
+                transition-all duration-300 cursor-pointer select-none no-underline
+              "
+            >
+              <PhoneCall className="w-5 h-5 text-white stroke-[2.2]" />
+              <span>{secondaryButtonText}</span>
+            </MotionLink>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* AEP Implementation Enquiry CTA Modal Form */}
+      <AEPCTAForm
+        isOpen={isFormOpen}
+        onClose={() => setIsFormOpen(false)}
+        mode="modal"
+      />
+    </>
   );
 }
 
 export default AepCtaSection;
+

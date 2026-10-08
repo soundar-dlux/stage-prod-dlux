@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import React from "react";
 
 const VIDEO_SRC =
-    "https://videocdn.cdnpk.net/videos/ac83adfd-2d52-5606-852a-c4bb6631c0e6/horizontal/previews/magnific_watermarked/large.mp4";
+    "https://videos.ctfassets.net/pj0maraabon4/3183EqRWQFtQCzhx5hkF1o/5cae4930e406efb5d3a20a8c7cdcd0cf/Hero-Video.mp4";
 
 export default function HeroBanner() {
     return (
@@ -15,7 +15,7 @@ export default function HeroBanner() {
                     initial={{ opacity: 0, y: 25 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                    className="text-3xl sm:text-5xl lg:text-[54px] xl:text-[58px] font-extrabold tracking-tight text-black max-w-4xl leading-[1.18] sm:leading-[1.14]"
+                    className="text-3xl sm:text-5xl lg:text-[54px] font-extrabold tracking-tight text-black max-w-4xl leading-[1.18] sm:leading-[1.14]"
                 >
                     What Adobe Experience <br className="hidden sm:inline" />
                     Platform Does{" "}

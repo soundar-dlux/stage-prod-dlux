@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ImageLRComponents from "@/src/components/ui/WB-Components/imageLRComponenets";
 
@@ -23,7 +23,6 @@ const tabsData: TabItem[] = [
       "https://images.ctfassets.net/pj0maraabon4/7cNc58046Nf6MHPlIYzOAt/a9713b1dddc92cb0a087ad01b55688ea/Adobe_Solution-partner.png",
     description:
       "We help organisations unlock the full value of Adobe Experience Cloud through consulting, implementation, and optimisation, backed by Adobe's own best practices.",
-
   },
   {
     id: "engineers",
@@ -33,7 +32,6 @@ const tabsData: TabItem[] = [
       "https://images.ctfassets.net/pj0maraabon4/5mprZ5Ku7rgfi5x9OokTDO/7e12606d7ff05ff8cd059ab449b88de1/Certified_Adobe_Engineers-orange.png",
     description:
       "Our team of certified Adobe architects and engineers bring deep domain expertise across AEP, RT-CDP, CJA, AJO, and Target to guarantee production-ready enterprise performance.",
-
   },
   {
     id: "experience",
@@ -43,29 +41,37 @@ const tabsData: TabItem[] = [
       "https://images.ctfassets.net/pj0maraabon4/7Hot6WUFrjY4UKLnsuncaW/6c7ab086d58be357b6f28ea826c840f2/Enterprise_Delivery_Experience.png",
     description:
       "Proven track record delivering complex digital experience transformations for global enterprise clients, ensuring seamless integration, strict governance, and rapid time-to-value.",
-
   },
   {
     id: "delivery",
     label: "Engineering-Led Delivery",
     heading: "Engineering-Led Delivery",
     imageSrc:
-      "https://images.ctfassets.net/pj0maraabon4/7i18XzsQkgsCyZi4xF8mi1/7c271cc5af60e3a86f500cf30fbaca40/Engineering-Led_Delivery.png",
+      "https://images.ctfassets.net/pj0maraabon4/4C70HIHsbIarQkgHPuMJoU/22883fbd1c286682e2bc8eaaa71dc862/Engineering-Led_Delivery__1_.png",
     description:
       "We combine strategic vision with hands-on technical execution — building robust data pipelines, scalable architectures, and custom integrations tailored to your tech stack.",
-
   },
 ];
 
 export function WhyChooseDluxSection() {
   const [activeTab, setActiveTab] = useState<string>("partner");
+  const tabRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
 
   const currentTab = tabsData.find((t) => t.id === activeTab) || tabsData[0];
 
+  const handleTabClick = (id: string) => {
+    setActiveTab(id);
+    if (tabRefs.current[id]) {
+      tabRefs.current[id]?.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "center",
+      });
+    }
+  };
+
   return (
     <section className="relative w-full bg-white py-[40px] overflow-hidden font-sans">
-      {/* Top-Right Soft Ambient Glow */}
-      <div className="absolute top-0 right-0 w-[450px] h-[450px] bg-[radial-gradient(circle,_rgba(255,120,40,0.12),_transparent_70%)] pointer-events-none blur-2xl" />
 
       <div className="relative max-w-full mx-auto px-4 sm:px-6 lg:px-8">
         {/* =========================================================
@@ -78,7 +84,7 @@ export function WhyChooseDluxSection() {
           transition={{ duration: 0.6 }}
           className="text-center max-w-4xl mx-auto mb-10 sm:mb-12"
         >
-          <h2 className="text-3xl sm:text-4xl lg:text-[46px] font-extrabold tracking-tight text-black leading-tight mb-5">
+          <h2 className="text-3xl sm:text-4xl lg:text-[46px] font-extrabold tracking-tight text-black lg:leading-tight mb-5">
             Why <span className="text-[#FF4F00]">Clients choose DLUX</span> as their
             <br className="hidden sm:inline" /> Adobe Partner
           </h2>
@@ -94,7 +100,7 @@ export function WhyChooseDluxSection() {
             FOLDER TABBED NAVIGATION BAR
            ========================================================= */}
         <div className="w-full flex flex-col items-center mb-12 sm:mb-16">
-          <div className="w-full flex items-center justify-center overflow-x-auto scrollbar-hide">
+          <div className="w-full flex items-center justify-start sm:justify-center overflow-x-auto scrollbar-hide px-2">
             <div className="flex items-center min-w-max">
               {tabsData.map((tab, index) => {
                 const isActive = activeTab === tab.id;
@@ -102,42 +108,46 @@ export function WhyChooseDluxSection() {
                 return (
                   <button
                     key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
+                    ref={(el) => {
+                      tabRefs.current[tab.id] = el;
+                    }}
+                    onClick={() => handleTabClick(tab.id)}
                     className={`
-              relative
-              w-[329.5px]
-              h-[65px]
-              flex items-center justify-center
-              gap-[10px]
-              pt-[13px]
-              pr-[48px]
-              pb-[12px]
-              pl-[48px]
-              font-bold text-sm sm:text-base
-              transition-all duration-200
-              cursor-pointer select-none
+                      relative
+                      w-[329.5px]
+                      h-[65px]
+                      flex items-center justify-center
+                      bg-white
+                      gap-[10px]
+                      pt-[13px]
+                      pr-[48px]
+                      pb-[12px]
+                      pl-[48px]
+                      font-bold text-sm sm:text-base
+                      transition-all duration-200
+                      cursor-pointer select-none
 
-              border border-gray-200
+                      border border-gray-200
 
-              ${index % 2 === 0 ? "border-t-0" : "border-b-0"}
+                      ${index % 2 === 0 ? "border-t-0" : "border-b-0"}
 
-              ${index > 0 ? "-ml-[1px]" : ""}
+                      ${index > 0 ? "-ml-[1px]" : ""}
 
-              ${isActive
+                      ${isActive
                         ? `
-                    bg-white
-                    text-[#FF4F00]
-                    border-gray-300
-                    z-10
-                  `
+                            bg-white
+                            text-[#FF4F00]
+                            border-gray-300
+                            z-10
+                          `
                         : `
-                    bg-gray-50/70
-                    text-gray-700
-                    hover:text-[#FF4F00]
-                    hover:bg-white
-                  `
+                            bg-gray-50/70
+                            text-gray-700
+                            hover:text-[#FF4F00]
+                            hover:bg-white
+                          `
                       }
-            `}
+                    `}
                   >
                     {isActive && (
                       <span className="absolute top-0 left-0 right-0 h-[3px] bg-[#FF4F00]" />

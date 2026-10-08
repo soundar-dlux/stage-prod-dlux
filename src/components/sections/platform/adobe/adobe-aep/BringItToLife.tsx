@@ -101,7 +101,7 @@ export function BringItToLifeSection({
             className="col-span-1 lg:col-span-7 flex flex-col justify-center"
           >
             {/* Section Title */}
-            <h2 className="text-3xl sm:text-4xl lg:text-[44px] font-extrabold tracking-tight text-black leading-tight mb-8 sm:mb-10">
+            <h2 className="text-3xl sm:text-4xl lg:text-[44px] font-extrabold tracking-tight text-black lg:leading-tight mb-8 sm:mb-10">
               {title}
             </h2>
 

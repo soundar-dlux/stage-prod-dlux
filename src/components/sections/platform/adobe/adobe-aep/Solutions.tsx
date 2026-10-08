@@ -38,6 +38,7 @@ const solutions = [
 
 export function SolutionsSection() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [isHovered, setIsHovered] = useState(false);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
 
@@ -59,11 +60,31 @@ export function SolutionsSection() {
     };
   }, []);
 
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const interval = setInterval(() => {
+      if (isHovered) return;
+
+      const { scrollLeft, scrollWidth, clientWidth } = container;
+      const scrollAmount = clientWidth < 640 ? clientWidth * 0.88 + 16 : 424;
+
+      if (scrollLeft + clientWidth >= scrollWidth - 10) {
+        container.scrollTo({ left: 0, behavior: "smooth" });
+      } else {
+        container.scrollBy({ left: scrollAmount, behavior: "smooth" });
+      }
+    }, 3500);
+
+    return () => clearInterval(interval);
+  }, [isHovered]);
+
   const handlePrev = () => {
     if (!scrollContainerRef.current) return;
     const scrollAmount =
       scrollContainerRef.current.clientWidth < 640
-        ? scrollContainerRef.current.clientWidth * 0.88
+        ? scrollContainerRef.current.clientWidth * 0.88 + 16
         : 424;
     scrollContainerRef.current.scrollBy({
       left: -scrollAmount,
@@ -75,7 +96,7 @@ export function SolutionsSection() {
     if (!scrollContainerRef.current) return;
     const scrollAmount =
       scrollContainerRef.current.clientWidth < 640
-        ? scrollContainerRef.current.clientWidth * 0.88
+        ? scrollContainerRef.current.clientWidth * 0.88 + 16
         : 424;
     scrollContainerRef.current.scrollBy({
       left: scrollAmount,
@@ -94,7 +115,7 @@ export function SolutionsSection() {
           transition={{ duration: 0.6 }}
           className="text-center mb-10 sm:mb-16"
         >
-          <h2 className="text-3xl sm:text-4xl lg:text-[46px] font-extrabold text-black tracking-tight leading-tight">
+          <h2 className="text-3xl sm:text-4xl lg:text-[46px] font-extrabold text-black tracking-tight lg:leading-tight">
             The Solution Behind{" "}
             <span className="text-[#FF4F00]">
               Real-
@@ -107,6 +128,8 @@ export function SolutionsSection() {
         {/* Cards Row (using WbCard component with scrollable container) */}
         <div
           ref={scrollContainerRef}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
           className="
             flex overflow-x-auto gap-4 sm:gap-6 lg:gap-8 pb-4 sm:pb-6
             scrollbar-hide snap-x snap-mandatory scroll-smooth
@@ -143,15 +166,15 @@ export function SolutionsSection() {
           ))}
         </div>
 
-        {/* Bottom Carousel Navigation Controls (Arrows) */}
-        <div className="flex items-center justify-center gap-4 mt-4 sm:mt-6">
+        {/* Bottom Navigation Arrows (Mobile Only: flex sm:hidden) */}
+        <div className="flex sm:hidden items-center justify-center gap-4 mt-4">
           {/* Previous Arrow Button */}
           <button
             onClick={handlePrev}
             disabled={!canScrollLeft}
             aria-label="Previous Card"
             className={`
-              w-10 h-10 sm:w-11 sm:h-11 rounded-full border
+              w-10 h-10 rounded-full border
               flex items-center justify-center transition-all duration-300
               shadow-sm bg-white
               ${canScrollLeft
@@ -169,7 +192,7 @@ export function SolutionsSection() {
             disabled={!canScrollRight}
             aria-label="Next Card"
             className={`
-              w-10 h-10 sm:w-11 sm:h-11 rounded-full border
+              w-10 h-10 rounded-full border
               flex items-center justify-center transition-all duration-300
               shadow-sm bg-white
               ${canScrollRight

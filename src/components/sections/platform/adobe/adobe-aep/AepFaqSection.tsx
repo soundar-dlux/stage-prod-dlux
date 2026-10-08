@@ -76,7 +76,7 @@ export function AepFaqSection({
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-3xl sm:text-4xl lg:text-[42px] font-extrabold text-[#FF4F00] text-center tracking-tight leading-tight mb-10 sm:mb-14"
+          className="text-3xl sm:text-4xl lg:text-[42px] font-extrabold text-[#FF4F00] text-center tracking-tight lg:leading-tight mb-10 sm:mb-14"
         >
           {title}
         </motion.h2>
