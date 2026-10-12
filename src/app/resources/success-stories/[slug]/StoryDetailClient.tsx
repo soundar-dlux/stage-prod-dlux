@@ -35,24 +35,9 @@ export default function StoryDetailClient({ story, relatedStories }: Props) {
     setShowPopup(true);
   };
 
-  const handleZohoSubmit = () => {
-    setTimeout(() => {
-      const pdfUrl = story?.caseStudyPdf?.url;
-      if (pdfUrl) {
-        const newTab = window.open(pdfUrl, "_blank");
-
-        const link = document.createElement("a");
-        link.href = pdfUrl;
-        link.download = story?.caseStudyPdf?.fileName || "case-study.pdf";
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }
-    }, 500);
-  };
-
   const handleFormChange = (field: string, value: string) => {
     setFormData((p) => ({ ...p, [field]: value }));
+    setErrorMsg("");
   };
 
   const handleFormSubmit = async (e: React.FormEvent) => {
@@ -75,18 +60,41 @@ export default function StoryDetailClient({ story, relatedStories }: Props) {
     setSubmitting(true);
 
     try {
-      const pdfUrl = story?.caseStudyPdf?.url;
+      const res = await fetch("/api/downloads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          slug: story?.slug,
+          pdfUrl: story?.caseStudyPdf?.url,
+        }),
+      });
 
-      if (pdfUrl) {
-        setShowPopup(false);
-        window.open(pdfUrl, "_blank", "noopener,noreferrer");
-      } else {
-        setErrorMsg("PDF not available for this case study.");
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        setErrorMsg(
+          data.error || "Unable to verify submission. Please try again."
+        );
+        setSubmitting(false);
+        return;
       }
-    } catch (err) {
-      console.error("Submit error:", err);
-      setErrorMsg("Something went wrong. Try again later.");
-    } finally {
+
+      setSubmitting(false);
+      setShowPopup(false);
+
+      if (data.downloadUrl) {
+        const link = document.createElement("a");
+        link.href = data.downloadUrl;
+        link.download = data.fileName || "case-study.pdf";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    } catch {
+      setErrorMsg("Network error. Please try again.");
       setSubmitting(false);
     }
   };
@@ -334,41 +342,55 @@ export default function StoryDetailClient({ story, relatedStories }: Props) {
                 </p>
               </div>
 
+              {errorMsg && (
+                <div className="mb-4 p-3 bg-red-500/20 border border-red-500/40 rounded-xl text-red-200 text-xs text-center">
+                  {errorMsg}
+                </div>
+              )}
+
               <form
-                action="https://forms.zohopublic.in/dluxtech/form/CaseStudy/formperma/0LVpLbO3hslRPlQhT44Z9tQvahSsqj3xJwwmeLn_4Sg/htmlRecords/submit"
-                method="POST"
-                onSubmit={handleZohoSubmit}
+                onSubmit={handleFormSubmit}
                 className="space-y-5"
               >
                 <input
                   type="text"
-                  name="Name_First"
+                  name="name"
+                  value={formData.name}
+                  onChange={(e) => handleFormChange("name", e.target.value)}
                   required
-                  className="w-full px-4 py-3 rounded-xl bg-white/15"
-                  placeholder="First Name"
+                  disabled={submitting}
+                  className="w-full px-4 py-3 rounded-xl bg-white/15 outline-none focus:ring-1 focus:ring-orange-500 disabled:opacity-50"
+                  placeholder="Your Name"
                 />
 
                 <input
                   type="email"
-                  name="Email"
+                  name="email"
+                  value={formData.email}
+                  onChange={(e) => handleFormChange("email", e.target.value)}
                   required
-                  className="w-full px-4 py-3 rounded-xl bg-white/15"
+                  disabled={submitting}
+                  className="w-full px-4 py-3 rounded-xl bg-white/15 outline-none focus:ring-1 focus:ring-orange-500 disabled:opacity-50"
                   placeholder="Email"
                 />
 
                 <input
                   type="text"
-                  name="PhoneNumber_countrycode"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={(e) => handleFormChange("phone", e.target.value)}
                   required
-                  className="w-full px-4 py-3 rounded-xl bg-white/15"
+                  disabled={submitting}
+                  className="w-full px-4 py-3 rounded-xl bg-white/15 outline-none focus:ring-1 focus:ring-orange-500 disabled:opacity-50"
                   placeholder="Phone"
                 />
 
                 <button
                   type="submit"
-                  className="w-full py-3 rounded-xl bg-gradient-to-br from-orange-500 via-red-500 to-red-700 font-semibold"
+                  disabled={submitting}
+                  className="w-full py-3 rounded-xl bg-gradient-to-br from-orange-500 via-red-500 to-red-700 font-semibold disabled:opacity-50 cursor-pointer"
                 >
-                  Submit & Download
+                  {submitting ? "Verifying..." : "Submit & Download"}
                 </button>
               </form>
             </motion.div>

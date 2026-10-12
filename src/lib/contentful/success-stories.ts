@@ -1,3 +1,4 @@
+import "server-only";
 import {
   SUCCESS_STORIES_QUERY,
   SUCCESS_STORY_BY_SLUG_QUERY,

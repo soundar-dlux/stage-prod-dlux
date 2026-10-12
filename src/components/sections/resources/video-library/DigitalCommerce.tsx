@@ -4,6 +4,7 @@ import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, ChevronRight, X } from "lucide-react";
+import { resolveSafeMedia } from "@/src/lib/security/content-urls";
 
 const SLIDES = [
   {
@@ -266,55 +267,55 @@ const nextCard = {
 
       {/* VIDEO POPUP */}
       <AnimatePresence>
-        {videoOpen && (
-          <motion.div
-            className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/80"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
+        {videoOpen && (() => {
+          const resolvedMedia = resolveSafeMedia(SLIDES[index]?.videoUrl, { autoplay: true });
+          return (
             <motion.div
-              className="relative w-full h-full bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl overflow-hidden flex items-center justify-center"
-              initial={{ scale: 0.7, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.7, opacity: 0 }}
-              transition={{ duration: 0.5 }}
+              className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/80"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
             >
-              <button
-                className="absolute top-4 right-4 z-50 bg-white/10 backdrop-blur-md border border-white/20 rounded-full p-2 hover:bg-white/20 transition"
-                onClick={() => setVideoOpen(false)}
+              <motion.div
+                className="relative w-full h-full bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl overflow-hidden flex items-center justify-center"
+                initial={{ scale: 0.7, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.7, opacity: 0 }}
+                transition={{ duration: 0.5 }}
               >
-                <X size={24} />
-              </button>
+                <button
+                  className="absolute top-4 right-4 z-50 bg-white/10 backdrop-blur-md border border-white/20 rounded-full p-2 hover:bg-white/20 transition"
+                  onClick={() => setVideoOpen(false)}
+                  aria-label="Close modal"
+                >
+                  <X size={24} />
+                </button>
 
-              {SLIDES[index].videoUrl.includes("youtube") ||
-              SLIDES[index].videoUrl.includes("youtu.be") ? (
-                <iframe
-                  src={
-                    SLIDES[index].videoUrl.includes("watch?v=")
-                      ? SLIDES[index].videoUrl.replace("watch?v=", "embed/")
-                      : SLIDES[index].videoUrl.replace(
-                          "youtu.be/",
-                          "www.youtube.com/embed/"
-                        )
-                  }
-                  title="YouTube video player"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  className="w-[800px] h-[450px] rounded-lg"
-                ></iframe>
-              ) : (
-                <video
-                  src={SLIDES[index].videoUrl}
-                  controls
-                  autoPlay
-                  className="w-[800px] h-[450px] object-contain rounded-lg bg-black"
-                />
-              )}
+                {resolvedMedia?.kind === "embed" ? (
+                  <iframe
+                    src={resolvedMedia.embedUrl}
+                    title="Video player"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    referrerPolicy="strict-origin-when-cross-origin"
+                    className="w-[800px] h-[450px] rounded-lg border-0"
+                  />
+                ) : resolvedMedia?.kind === "direct" ? (
+                  <video
+                    src={resolvedMedia.mediaUrl}
+                    controls
+                    autoPlay
+                    className="w-[800px] h-[450px] object-contain rounded-lg bg-black"
+                  />
+                ) : (
+                  <div className="flex w-[800px] h-[450px] items-center justify-center text-white/70">
+                    Video source is unavailable or unsupported.
+                  </div>
+                )}
+              </motion.div>
             </motion.div>
-          </motion.div>
-        )}
+          );
+        })()}
       </AnimatePresence>
     </section>
   );

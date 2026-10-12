@@ -1,4 +1,4 @@
-// fetchWorkfrontFusion.ts
+import "server-only";
 import { WORKFRONT_FUSION_QUERY } from "@/src/app/platform/adobe/workfront-fusion/queries";
 import { FusionResponse } from "@/src/app/platform/adobe/workfront-fusion/types";
 

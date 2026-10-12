@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Play, X } from "lucide-react";
+import { resolveSafeMedia } from "@/src/lib/security/content-urls";
 
 const cards = [
   {
@@ -243,44 +244,54 @@ export default function CEOvideo() {
 
       {/* VIDEO MODAL */}
       <AnimatePresence>
-        {activeVideo && (
-          <motion.div
-            className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/80"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
+        {activeVideo && (() => {
+          const resolvedMedia = resolveSafeMedia(activeVideo, { autoplay: true });
+          return (
             <motion.div
-              className="relative w-full max-w-4xl p-4"
-              initial={{ scale: 0.8 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.8 }}
+              className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/80"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
             >
-              <button
-                onClick={() => setActiveVideo(null)}
-                className="absolute top-4 right-4 bg-white/20 rounded-full p-2"
+              <motion.div
+                className="relative w-full max-w-4xl p-4"
+                initial={{ scale: 0.8 }}
+                animate={{ scale: 1 }}
+                exit={{ scale: 0.8 }}
               >
-                <X size={24} />
-              </button>
+                <button
+                  onClick={() => setActiveVideo(null)}
+                  className="absolute top-4 right-4 bg-white/20 rounded-full p-2 hover:bg-white/40 transition"
+                  aria-label="Close modal"
+                >
+                  <X size={24} />
+                </button>
 
-              {activeVideo.includes("youtube") ? (
-                <iframe
-                  src={activeVideo.replace("watch?v=", "embed/")}
-                  className="w-full h-[450px] rounded-lg"
-                  allowFullScreen
-                  title="CEO Video"
-                />
-              ) : (
-                <video
-                  src={activeVideo}
-                  controls
-                  autoPlay
-                  className="w-full h-[450px] rounded-lg bg-black"
-                />
-              )}
+                {resolvedMedia?.kind === "embed" ? (
+                  <iframe
+                    src={resolvedMedia.embedUrl}
+                    className="w-full h-[450px] rounded-lg border-0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    referrerPolicy="strict-origin-when-cross-origin"
+                    title="CEO Video"
+                  />
+                ) : resolvedMedia?.kind === "direct" ? (
+                  <video
+                    src={resolvedMedia.mediaUrl}
+                    controls
+                    autoPlay
+                    className="w-full h-[450px] rounded-lg bg-black"
+                  />
+                ) : (
+                  <div className="flex h-[450px] w-full items-center justify-center rounded-lg bg-black/80 text-white/70">
+                    Video source is unavailable or unsupported.
+                  </div>
+                )}
+              </motion.div>
             </motion.div>
-          </motion.div>
-        )}
+          );
+        })()}
       </AnimatePresence>
     </section>
   );

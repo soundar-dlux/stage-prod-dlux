@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { Linkedin, ExternalLink } from "lucide-react";
+import { getVideoEmbedDetails } from "@/src/lib/security/content-urls";
 
 interface VideoModalProps {
   isOpen: boolean;
@@ -14,49 +15,6 @@ export default function CommonVideoModal({
   videoUrl,
   onClose,
 }: VideoModalProps) {
-
-  const getEmbedUrl = (url?: string) => {
-    if (!url) return "";
-    let embedUrl = url;
-
-    // Format YouTube sharing links to standard embed paths
-    if (url.includes("youtu.be")) {
-      const id = url.split("youtu.be/")[1]?.split("?")[0];
-      embedUrl = `https://www.youtube.com/embed/${id}`;
-    } else if (url.includes("youtube.com/watch")) {
-      try {
-        const params = new URL(url);
-        const id = params.searchParams.get("v");
-        embedUrl = `https://www.youtube.com/embed/${id}`;
-      } catch {
-        const match = url.match(/[?&]v=([^&#]*)/);
-        if (match && match[1]) {
-          embedUrl = `https://www.youtube.com/embed/${match[1]}`;
-        }
-      }
-    }
-
-    // Append autoplay correctly, avoiding duplicate '?' query symbols
-    if (!embedUrl.includes("autoplay=1")) {
-      const separator = embedUrl.includes("?") ? "&" : "?";
-      embedUrl = `${embedUrl}${separator}autoplay=1`;
-    }
-
-    return embedUrl;
-  };
-
-  const getOriginalUrl = (url?: string) => {
-    if (!url) return "";
-    if (url.includes("linkedin.com/embed/feed/update")) {
-      return url.replace("linkedin.com/embed/feed/update", "linkedin.com/feed/update");
-    }
-    if (url.includes("youtube.com/embed/")) {
-      const id = url.split("youtube.com/embed/")[1]?.split("?")[0];
-      return `https://www.youtube.com/watch?v=${id}`;
-    }
-    return url;
-  };
-
   /* ✅ Hook always runs — condition handled inside */
   useEffect(() => {
     if (!isOpen) return;
@@ -77,8 +35,9 @@ export default function CommonVideoModal({
   /* ✅ Early return AFTER hook */
   if (!isOpen) return null;
 
-  const isLinkedIn = videoUrl?.includes("linkedin.com");
-  const isYouTube = videoUrl?.includes("youtube.com") || videoUrl?.includes("youtu.be");
+  const videoDetails = getVideoEmbedDetails(videoUrl, { autoplay: true });
+  const isLinkedIn = videoDetails?.type === "linkedin";
+  const isYouTube = videoDetails?.type === "youtube";
 
   return (
     <div
@@ -106,22 +65,29 @@ export default function CommonVideoModal({
         </button>
 
         {/* Video */}
-        <iframe
-          src={getEmbedUrl(videoUrl)}
-          className="w-full h-full"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowFullScreen
-          referrerPolicy="strict-origin-when-cross-origin"
-        />
+        {videoDetails ? (
+          <iframe
+            src={videoDetails.embedUrl}
+            title={isYouTube ? "YouTube Video Player" : "LinkedIn Video Player"}
+            className="w-full h-full border-0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+            referrerPolicy="strict-origin-when-cross-origin"
+          />
+        ) : (
+          <div className="flex w-full h-full items-center justify-center text-sm text-white/70">
+            Video source is unavailable or unsupported.
+          </div>
+        )}
 
         {/* LinkedIn Fallback Watch Button */}
-        {isLinkedIn && (
+        {isLinkedIn && videoDetails && (
           <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center bg-black/85 border border-white/10 px-4 py-3 rounded-lg backdrop-blur-md">
             <span className="text-[11px] text-white/70 hidden sm:inline">
               If the video is blocked by cookies/security, watch directly on LinkedIn:
             </span>
             <a
-              href={getOriginalUrl(videoUrl)}
+              href={videoDetails.watchUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 bg-[#0077b5] hover:bg-[#006297] text-white text-xs font-semibold px-4 py-2 rounded-lg transition-all duration-300 shadow-md hover:scale-[1.02] ml-auto"
@@ -134,13 +100,13 @@ export default function CommonVideoModal({
         )}
 
         {/* YouTube Fallback Watch Button */}
-        {isYouTube && (
+        {isYouTube && videoDetails && (
           <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center bg-black/85 border border-white/10 px-4 py-3 rounded-lg backdrop-blur-md">
             <span className="text-[11px] text-white/70 hidden sm:inline">
               If the video player shows a configuration error, watch directly on YouTube:
             </span>
             <a
-              href={getOriginalUrl(videoUrl)}
+              href={videoDetails.watchUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 bg-[#ff0000] hover:bg-[#cc0000] text-white text-xs font-semibold px-4 py-2 rounded-lg transition-all duration-300 shadow-md hover:scale-[1.02] ml-auto animate-pulse"

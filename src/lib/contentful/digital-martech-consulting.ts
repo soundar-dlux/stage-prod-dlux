@@ -1,3 +1,4 @@
+import "server-only";
 import { DIGITAL_MARTECH_QUERY } from "@/src/app/services/digital-&-martech-consulting/queries";
 import { DigitalMartechPageData } from "@/src/app/services/digital-&-martech-consulting/types";
 

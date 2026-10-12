@@ -9,11 +9,13 @@ import {
 } from "react-icons/fa";
 import CaseStudyLeadForm from "@/src/components/ui/Forms/CaseStudyLeadForm";
 
-export default function CaseStudyActions({
-  pdfUrl,
-}: {
+interface Props {
+  slug?: string;
   pdfUrl?: string;
-}) {
+  title?: string;
+}
+
+export default function CaseStudyActions({ slug, pdfUrl }: Props) {
   const [copied, setCopied] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -37,17 +39,18 @@ export default function CaseStudyActions({
     }
   };
 
+  const hasDownload = Boolean(slug || pdfUrl);
+
   return (
     <>
       <div className="flex flex-wrap items-center gap-4">
-
         {/* DOWNLOAD → OPENS FORM */}
-        {pdfUrl && (
+        {hasDownload && (
           <button
             onClick={() => setOpen(true)}
             className="flex items-center gap-2 px-4 py-2 rounded-full 
             bg-gradient-to-r from-orange-500 to-orange-600 
-            text-white text-sm font-medium hover:scale-105 transition"
+            text-white text-sm font-medium hover:scale-105 transition cursor-pointer"
           >
             <FaDownload size={14} />
             Download
@@ -59,7 +62,7 @@ export default function CaseStudyActions({
           onClick={handleCopy}
           className="flex items-center gap-2 px-4 py-2 rounded-full 
           bg-white/10 border border-white/20 text-white text-sm 
-          hover:bg-white/20 transition"
+          hover:bg-white/20 transition cursor-pointer"
         >
           {copied ? <FaCheck size={14} /> : <FaLink size={14} />}
           {copied ? "Copied" : "Copy"}
@@ -70,15 +73,16 @@ export default function CaseStudyActions({
           onClick={handleShare}
           className="flex items-center gap-2 px-4 py-2 rounded-full 
           bg-white/10 border border-white/20 text-white text-sm 
-          hover:bg-white/20 transition"
+          hover:bg-white/20 transition cursor-pointer"
         >
           <FaShareAlt size={14} />
           Share
         </button>
       </div>
 
-      {/* ✅ REUSED FORM */}
+      {/* REUSED GATED FORM */}
       <CaseStudyLeadForm
+        slug={slug}
         pdfUrl={pdfUrl}
         open={open}
         setOpen={setOpen}

@@ -1,3 +1,4 @@
+import "server-only";
 import { BLOGS_QUERY } from "@/src/app/resources/our-webinars/queries";
 import { BlogsData } from "@/src/app/resources/our-webinars/types";
 

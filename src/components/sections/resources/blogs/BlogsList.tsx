@@ -5,7 +5,6 @@ import Image from "next/image";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import { FaArrowRight, FaPlay, FaAngleRight } from "react-icons/fa6";
 import Link from "next/link";
-import { GraphQLClient, gql } from "graphql-request";
 
 /* ================= TYPES ================= */
 
@@ -19,7 +18,7 @@ type Blog = {
   link: string;
 };
 
-type Video = {
+export type Video = {
   title: string;
   description: string;
   videoSrc: { url: string };
@@ -27,37 +26,11 @@ type Video = {
   trending?: boolean;
 };
 
-/* ================= DUMMY DATA ================= */
+interface BlogsListProps {
+  initialVideos?: Video[];
+}
 
-
-const videosQuery = gql`
-  query {
-    coEVideosCollection {
-      items {
-        title
-        description
-        videoSrc {
-          url
-        }
-        trending
-        videoBanner {
-          url
-        }
-      }
-    }
-  }
-`;
-
-const endpoint =
-  "https://graphql.contentful.com/content/v1/spaces/pj0maraabon4/environments/production";
-
-const client = new GraphQLClient(endpoint, {
-  headers: {
-    Authorization: `Bearer 6t-wgSsZnD80bBuG3_VNcGKE0lF-LAE7EPa5NE286HU`,
-  },
-});
-
-export default function BlogsList() {
+export default function BlogsList({ initialVideos = [] }: BlogsListProps) {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -130,22 +103,10 @@ export default function BlogsList() {
   }, []);
 
   useEffect(() => {
-    let isMounted = true;
-    const fetchVideos = async () => {
-      try {
-        const data: any = await client.request(videosQuery);
-        if (!isMounted) return;
-        const items = data?.coEVideosCollection?.items || [];
-        setVideos(items);
-      } catch (err) {
-        console.error("Error fetching CoE videos:", err);
-      }
-    };
-    fetchVideos();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+    if (initialVideos.length > 0) {
+      setVideos(initialVideos);
+    }
+  }, [initialVideos]);
 
   const filters = useMemo(() => {
     if (categories.length > 0) {

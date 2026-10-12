@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import CaseStudyActions from "@/src/components/ui/CaseStudyActions";
+import { fetchContentfulGraphQL } from "@/src/lib/contentful/server-client";
 
 /* ---------------- TYPES ---------------- */
 
@@ -29,54 +30,41 @@ interface CaseStudy {
 async function getCaseStudy(slug?: string): Promise<CaseStudy | null> {
   if (!slug) return null;
 
-  try {
-    const res = await fetch(
-      "https://graphql.contentful.com/content/v1/spaces/pj0maraabon4/environments/production",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization:
-            "Bearer 6t-wgSsZnD80bBuG3_VNcGKE0lF-LAE7EPa5NE286HU",
-        },
-        body: JSON.stringify({
-          query: `
-            query GetCaseStudy($slug: String!) {
-              caseStudyCollection(where: { slug: $slug }, limit: 1) {
-                items {
-                  title
-                  slug
-                  client
-                  industry
-                  location
-                  stakes
-                  summary
-                  challengesBottlenecks
-                  turningPoint
-                  conclusion
-                  banner {
-                    url
-                    description
-                  }
-                  caseStudyPdf {
-                    url
-                  }
-                }
-              }
+  const data = await fetchContentfulGraphQL<{
+    caseStudyCollection?: { items?: CaseStudy[] };
+  }>(
+    `
+      query GetCaseStudy($slug: String!) {
+        caseStudyCollection(where: { slug: $slug }, limit: 1) {
+          items {
+            title
+            slug
+            client
+            industry
+            location
+            stakes
+            summary
+            challengesBottlenecks
+            turningPoint
+            conclusion
+            banner {
+              url
+              description
             }
-          `,
-          variables: { slug: slug.trim() },
-        }),
-        next: { revalidate: 60 },
+            caseStudyPdf {
+              url
+            }
+          }
+        }
       }
-    );
+    `,
+    {
+      variables: { slug: slug.trim() },
+      revalidate: 60,
+    }
+  );
 
-    const json = await res.json();
-    return json?.data?.caseStudyCollection?.items?.[0] || null;
-  } catch (error) {
-    console.error(error);
-    return null;
-  }
+  return data?.caseStudyCollection?.items?.[0] || null;
 }
 
 /* ---------------- METADATA ---------------- */
@@ -143,8 +131,8 @@ export default async function Page({
         {/* LEFT */}
         <div className="space-y-12">
 
-          {/* 🔥 ONLY ACTIONS (NO BIG BUTTON) */}
-          <CaseStudyActions pdfUrl={data.caseStudyPdf?.url} />
+          {/* ONLY ACTIONS (NO BIG BUTTON) */}
+          <CaseStudyActions slug={data.slug || slug} pdfUrl={data.caseStudyPdf?.url} />
 
           {data.summary && (
             <Section title="Executive Summary">{data.summary}</Section>

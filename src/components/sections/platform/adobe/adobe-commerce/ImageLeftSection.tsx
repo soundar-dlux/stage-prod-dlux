@@ -10,63 +10,29 @@ const BRAND = {
   secondary: "#F07800",
 };
 
-interface ContentData {
+export interface ContentData {
   title?: string;
   description?: string;
   url?: string;
 }
 
-export default function ImageLeftSection() {
-  const [contentData, setContentData] = useState<ContentData | null>(null);
+interface ImageLeftSectionProps {
+  initialContent?: ContentData | null;
+}
+
+export default function ImageLeftSection({
+  initialContent = null,
+}: ImageLeftSectionProps) {
+  const [contentData, setContentData] = useState<ContentData | null>(
+    initialContent
+  );
   const sectionRef = useRef<HTMLDivElement>(null);
 
-  /* Fetch content from Contentful */
   useEffect(() => {
-    const controller = new AbortController();
-
-    const fetchContent = async () => {
-      try {
-        const res = await fetch(
-          "https://graphql.contentful.com/content/v1/spaces/pj0maraabon4/environments/production",
-          {
-            method: "POST",
-            signal: controller.signal,
-            cache: "force-cache",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization:
-                "Bearer 6t-wgSsZnD80bBuG3_VNcGKE0lF-LAE7EPa5NE286HU",
-            },
-            body: JSON.stringify({
-              query: `
-                {
-                  platformAdobeCommerces(id: "231JBLMJLXr5L3FUHFNGEI") {
-                    imageLeftContent {
-                      title
-                      description
-                      url
-                    }
-                  }
-                }
-              `,
-            }),
-          }
-        );
-
-        const json = await res.json();
-        setContentData(
-          json?.data?.platformAdobeCommerces?.imageLeftContent ?? null
-        );
-      } catch (err: any) {
-        if (err.name !== "AbortError") {
-          console.error("Fetch Error:", err);
-        }
-      }
-    };
-
-    fetchContent();
-    return () => controller.abort();
-  }, []);
+    if (initialContent) {
+      setContentData(initialContent);
+    }
+  }, [initialContent]);
 
   /* GSAP Scroll Entrance Animations */
   useEffect(() => {

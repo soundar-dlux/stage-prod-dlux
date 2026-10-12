@@ -1,3 +1,4 @@
+import "server-only";
 import { CONTENT_MANAGEMENT_DAM_QUERY } from "@/src/app/services/content-management-&-dam/queries";
 
 const SPACE_ID = process.env.CONTENTFUL_SPACE_ID!;

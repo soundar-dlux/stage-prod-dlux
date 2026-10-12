@@ -10,74 +10,22 @@ type CardType = {
   url: string;
 };
 
-const QUERY = `
-{
-  blogPageCollection {
-    items {
-      dluxBlogCollection {
-        items {
-          title
-          description
-          url
-        }
-      }
-    }
-  }
+interface LeftRightCardsProps {
+  initialCards?: CardType[];
 }
-`;
 
-const LeftRightCards: React.FC = () => {
-  const [cardsData, setCardsData] = useState<CardType[]>([]);
-  const [loading, setLoading] = useState(true);
+const LeftRightCards: React.FC<LeftRightCardsProps> = ({
+  initialCards = [],
+}) => {
+  const [cardsData, setCardsData] = useState<CardType[]>(initialCards);
+  const [loading, setLoading] = useState(initialCards.length === 0);
 
   useEffect(() => {
-    const controller = new AbortController();
-
-    const fetchCards = async () => {
-      try {
-        const response = await fetch(
-          "https://graphql.contentful.com/content/v1/spaces/pj0maraabon4/environments/production",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization:
-                "Bearer 6t-wgSsZnD80bBuG3_VNcGKE0lF-LAE7EPa5NE286HU",
-            },
-            body: JSON.stringify({ query: QUERY }),
-            signal: controller.signal,
-          }
-        );
-
-        const data = await response.json();
-
-        const items =
-          data?.data?.blogPageCollection?.items?.[0]?.dluxBlogCollection
-            ?.items ?? [];
-
-        const mappedCards: CardType[] = items.map(
-          (item: any, index: number) => ({
-            title: item?.title ?? `Card ${index + 1}`,
-            description:
-              item?.description ?? "No description available.",
-            url: item?.url ?? "/placeholder.png",
-          })
-        );
-
-        setCardsData(mappedCards);
-      } catch (error: any) {
-        if (error.name !== "AbortError") {
-          console.error("Error fetching cards:", error);
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCards();
-
-    return () => controller.abort(); // cleanup
-  }, []);
+    if (initialCards.length > 0) {
+      setCardsData(initialCards);
+      setLoading(false);
+    }
+  }, [initialCards]);
 
   // Memoized cards (avoid re-render recalculation)
   const renderedCards = useMemo(() => {

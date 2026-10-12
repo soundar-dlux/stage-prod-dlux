@@ -11,18 +11,27 @@ const BRAND = {
   secondary: "#F07800",
 };
 
-interface Testimonial {
+export interface Testimonial {
   title?: string;
   description?: string;
   url?: string;
 }
 
-export default function Testimonials() {
-  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+interface TestimonialsProps {
+  initialTestimonials?: Testimonial[];
+}
+
+export default function Testimonials({
+  initialTestimonials = [],
+}: TestimonialsProps) {
+  const [testimonials, setTestimonials] =
+    useState<Testimonial[]>(initialTestimonials);
   const [active, setActive] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(initialTestimonials.length === 0);
   const [isHovering, setIsHovering] = useState(false);
-  const [windowWidth, setWindowWidth] = useState(typeof window !== "undefined" ? window.innerWidth : 1200);
+  const [windowWidth, setWindowWidth] = useState(
+    typeof window !== "undefined" ? window.innerWidth : 1200
+  );
 
   const progressRef = useRef<HTMLDivElement>(null);
   const progressBarTween = useRef<gsap.core.Tween | null>(null);
@@ -39,52 +48,12 @@ export default function Testimonials() {
   const isTablet = windowWidth >= 640 && windowWidth < 1024;
   const offsetX = isMobile ? 120 : isTablet ? 250 : 380;
 
-  /* Fetch Testimonials from Contentful */
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const res = await fetch(
-          "https://graphql.contentful.com/content/v1/spaces/pj0maraabon4/environments/production",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization:
-                "Bearer 6t-wgSsZnD80bBuG3_VNcGKE0lF-LAE7EPa5NE286HU",
-            },
-            body: JSON.stringify({
-              query: `
-                {
-                  platformAdobeCommerces(id:"231JBLMJLXr5L3FUHFNGEI") {
-                    dluxClientsSayCollection {
-                      items {
-                        title
-                        description
-                        url
-                      }
-                    }
-                  }
-                }
-              `,
-            }),
-          }
-        );
-
-        const json = await res.json();
-        const items =
-          json?.data?.platformAdobeCommerces?.dluxClientsSayCollection?.items ||
-          [];
-
-        setTestimonials(items);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
+    if (initialTestimonials.length > 0) {
+      setTestimonials(initialTestimonials);
+      setLoading(false);
     }
-
-    fetchData();
-  }, []);
+  }, [initialTestimonials]);
 
   /* Navigation Callbacks */
   const nextSlide = useCallback(() => {

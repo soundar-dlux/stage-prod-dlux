@@ -246,3 +246,129 @@ body{
     animation: none;
   }
 }
+
+/* ================= BLOG CONTENT STYLES ================= */
+.blog-content-html {
+  color: #e5e7eb;
+  line-height: 1.85;
+  font-size: 1.075rem;
+}
+
+.blog-content-html p {
+  margin-bottom: 1.5rem;
+}
+
+.blog-content-html h1,
+.blog-content-html h2,
+.blog-content-html h3,
+.blog-content-html h4,
+.blog-content-html h5,
+.blog-content-html h6 {
+  color: #ffffff;
+  font-weight: 700;
+  line-height: 1.3;
+  margin-top: 2.25rem;
+  margin-bottom: 1rem;
+}
+
+.blog-content-html h1 { font-size: 2.25rem; }
+.blog-content-html h2 { font-size: 1.75rem; color: #ff3901; }
+.blog-content-html h3 { font-size: 1.35rem; }
+.blog-content-html h4 { font-size: 1.15rem; }
+
+.blog-content-html strong,
+.blog-content-html b {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.blog-content-html a {
+  color: #ff3901;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  transition: opacity 0.2s ease;
+}
+
+.blog-content-html a:hover {
+  opacity: 0.85;
+}
+
+.blog-content-html ul {
+  list-style-type: disc;
+  margin-left: 1.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.blog-content-html ol {
+  list-style-type: decimal;
+  margin-left: 1.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.blog-content-html li {
+  margin-bottom: 0.5rem;
+  padding-left: 0.25rem;
+}
+
+.blog-content-html blockquote {
+  border-left: 4px solid #ff3901;
+  padding: 1rem 1.25rem;
+  margin: 1.75rem 0;
+  color: #d1d5db;
+  font-style: italic;
+  background: rgba(255, 57, 1, 0.06);
+  border-radius: 0 10px 10px 0;
+}
+
+.blog-content-html img {
+  border-radius: 0.75rem;
+  margin: 2rem auto;
+  max-width: 100%;
+  height: auto;
+  border: 1px solid #222;
+}
+
+.blog-content-html pre {
+  background: #111;
+  border: 1px solid #222;
+  border-radius: 0.5rem;
+  padding: 1.25rem;
+  overflow-x: auto;
+  margin-bottom: 1.5rem;
+}
+
+.blog-content-html code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 0.15rem 0.35rem;
+  border-radius: 0.25rem;
+  font-size: 0.9em;
+  color: #ff7849;
+}
+
+.blog-content-html pre code {
+  background: transparent;
+  padding: 0;
+  color: #e5e7eb;
+}
+
+.blog-content-html table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 2rem 0;
+  border: 1px solid #222;
+}
+
+.blog-content-html th,
+.blog-content-html td {
+  border: 1px solid #222;
+  padding: 0.75rem 1rem;
+  text-align: left;
+}
+
+.blog-content-html th {
+  background: #161616;
+  color: #ff3901;
+  font-weight: 600;
+}
+

@@ -1,3 +1,4 @@
+import "server-only";
 import { ADOBE_WORKFRONT_QUERY } from "@/src/app/services/adobe-managed-services/queries";
 import { AdobeWorkfrontPageData } from "@/src/app/services/adobe-managed-services/types";
 

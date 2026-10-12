@@ -1,81 +1,112 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import CommonModal from "../modal/CommonModal";
 import { motion } from "framer-motion";
 import ModalFormButton from "./ModalFormButton";
 
 interface Props {
   useCase: string;
-  pdf: string;
+  useCaseId?: string;
+  pdf?: string;
   open: boolean;
   onClose: () => void;
 }
 
 export default function UseCaseForm({
   useCase,
+  useCaseId,
   pdf,
   open,
   onClose,
 }: Props) {
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const [currentUseCase, setCurrentUseCase] = useState("");
-  const hiddenInputRef = useRef<HTMLInputElement>(null);
 
-  // ✅ ALWAYS SYNC STATE
+  const [formData, setFormData] = useState({
+    Name_First: "",
+    Name_Last: "",
+    Email: "",
+    PhoneNumber_countrycode: "",
+  });
+
   useEffect(() => {
     setCurrentUseCase(useCase);
-  }, [useCase]);
+    setErrorMessage("");
+  }, [useCase, open]);
 
-  // ✅ ALSO SYNC DOM (extra safety)
-  useEffect(() => {
-    if (hiddenInputRef.current) {
-      hiddenInputRef.current.value = currentUseCase;
-    }
-  }, [currentUseCase]);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
 
-  const handleSubmit = () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMessage("");
     setLoading(true);
 
-    // 🔥 ensure latest value before submit
-    if (hiddenInputRef.current) {
-      hiddenInputRef.current.value = currentUseCase;
-    }
+    try {
+      const res = await fetch("/api/downloads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firstName: formData.Name_First,
+          lastName: formData.Name_Last,
+          email: formData.Email,
+          phone: formData.PhoneNumber_countrycode,
+          useCase: currentUseCase || useCase,
+          assetId: useCaseId,
+          pdfUrl: pdf,
+        }),
+      });
 
-    setTimeout(() => {
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        setErrorMessage(
+          data.error || "Unable to verify submission. Please try again."
+        );
+        setLoading(false);
+        return;
+      }
+
       setLoading(false);
       onClose();
 
-      if (pdf) {
-        window.open(pdf, "_blank");
+      if (data.downloadUrl) {
+        const link = document.createElement("a");
+        link.href = data.downloadUrl;
+        link.download = data.fileName || "use-case.pdf";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
       }
-    }, 1200);
+    } catch {
+      setErrorMessage("Network error. Please try again.");
+      setLoading(false);
+    }
   };
 
   return (
-    <CommonModal open={open} onClose={onClose} title="Use Case Access">
+    <CommonModal
+      open={open}
+      onClose={() => {
+        if (!loading) onClose();
+      }}
+      title="Use Case Access"
+    >
       <div className="max-w-md mx-auto py-4">
         <p className="text-white/60 mb-6 text-sm">
           Fill in your details to access this use case.
         </p>
 
-        <form
-          action="https://forms.zohopublic.in/dluxtech/form/UseCase/formperma/s_J_55VkajPWW4bseOCq7Usz3VhfiIdc3upDK4Hq8bM/htmlRecords/submit"
-          method="POST"
-          target="hidden_iframe"
-          onSubmit={handleSubmit}
-          className="space-y-4"
-        >
-          {/* ✅ FIXED hidden input */}
-          <input
-            ref={hiddenInputRef}
-            type="hidden"
-            name="Dropdown"
-            value={currentUseCase}
-            readOnly
-          />
+        {errorMessage && (
+          <div className="mb-4 p-3 bg-red-500/20 border border-red-500/40 rounded-lg text-red-200 text-xs">
+            {errorMessage}
+          </div>
+        )}
 
-          {/* INPUTS */}
+        <form onSubmit={handleSubmit} className="space-y-4">
           {[
             { label: "First Name", name: "Name_First", type: "text" },
             { label: "Last Name", name: "Name_Last", type: "text" },
@@ -96,9 +127,12 @@ export default function UseCaseForm({
               <input
                 type={field.type}
                 name={field.name}
+                value={(formData as any)[field.name]}
+                onChange={handleChange}
                 required={field.name !== "PhoneNumber_countrycode"}
+                disabled={loading}
                 placeholder=" "
-                className="peer w-full px-4 pt-5 pb-2.5 bg-white/[0.05] border border-white/10 rounded-lg text-sm text-white backdrop-blur-md focus:border-brand-primary focus:ring-1 focus:ring-brand-primary/40 outline-none"
+                className="peer w-full px-4 pt-5 pb-2.5 bg-white/[0.05] border border-white/10 rounded-lg text-sm text-white backdrop-blur-md focus:border-brand-primary focus:ring-1 focus:ring-brand-primary/40 outline-none disabled:opacity-50"
               />
 
               <label
@@ -118,11 +152,9 @@ export default function UseCaseForm({
           <ModalFormButton
             loading={loading}
             label="Submit"
-            loadingLabel="Processing..."
+            loadingLabel="Verifying..."
           />
         </form>
-
-        <iframe name="hidden_iframe" style={{ display: "none" }} />
       </div>
     </CommonModal>
   );

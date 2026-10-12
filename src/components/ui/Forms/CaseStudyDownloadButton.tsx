@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import CommonModal from "../modal/CommonModal";
+import { getSafePdfUrl } from "@/src/lib/security/content-urls";
 
 interface Props {
   pdfUrl: string;
@@ -13,8 +14,9 @@ export default function CaseStudyDownloadButton({
   title,
 }: Props) {
   const [open, setOpen] = useState(false);
+  const safePdfUrl = getSafePdfUrl(pdfUrl);
 
-  if (!pdfUrl) return null;
+  if (!safePdfUrl) return null;
 
   return (
     <>
@@ -44,15 +46,16 @@ export default function CaseStudyDownloadButton({
         {/* PDF Preview */}
         <div className="h-[75vh] bg-gray-100">
           <iframe
-            src={pdfUrl}
-            className="w-full h-full"
+            src={safePdfUrl}
+            title={title || "Case Study Preview"}
+            className="w-full h-full border-0"
           />
         </div>
 
         {/* Download Section */}
         <div className="p-6 text-center border-t">
           <a
-            href={pdfUrl}
+            href={safePdfUrl}
             download
             target="_blank"
             rel="noopener noreferrer"

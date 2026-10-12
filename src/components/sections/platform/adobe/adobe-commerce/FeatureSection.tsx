@@ -7,68 +7,28 @@ const BRAND = {
   secondary: "#F07800",
 };
 
-interface FeatureItem {
+export interface FeatureItem {
   title?: string;
   description?: string;
   url?: string;
 }
 
-export default function FeatureSection() {
-  const [features, setFeatures] = useState<FeatureItem[]>([]);
-  const [loading, setLoading] = useState(true);
+interface FeatureSectionProps {
+  initialFeatures?: FeatureItem[];
+}
+
+export default function FeatureSection({
+  initialFeatures = [],
+}: FeatureSectionProps) {
+  const [features, setFeatures] = useState<FeatureItem[]>(initialFeatures);
+  const [loading, setLoading] = useState(initialFeatures.length === 0);
 
   useEffect(() => {
-    const controller = new AbortController();
-
-    const fetchFeatures = async () => {
-      try {
-        const res = await fetch(
-          "https://graphql.contentful.com/content/v1/spaces/pj0maraabon4/environments/production",
-          {
-            method: "POST",
-            signal: controller.signal,
-            cache: "force-cache",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization:
-                "Bearer 6t-wgSsZnD80bBuG3_VNcGKE0lF-LAE7EPa5NE286HU",
-            },
-            body: JSON.stringify({
-              query: `
-                query {
-                  platformAdobeCommerces(id:"231JBLMJLXr5L3FUHFNGEI") {
-                    adobeCommerceFeatutreCollection {
-                      items {
-                        title
-                        description
-                        url
-                      }
-                    }
-                  }
-                }
-              `,
-            }),
-          }
-        );
-
-        const json = await res.json();
-
-        setFeatures(
-          json?.data?.platformAdobeCommerces
-            ?.adobeCommerceFeatutreCollection?.items ?? []
-        );
-      } catch (err: any) {
-        if (err.name !== "AbortError") {
-          console.error("Feature Fetch Error:", err);
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchFeatures();
-    return () => controller.abort();
-  }, []);
+    if (initialFeatures.length > 0) {
+      setFeatures(initialFeatures);
+      setLoading(false);
+    }
+  }, [initialFeatures]);
 
   const featureList = useMemo(() => features, [features]);
 

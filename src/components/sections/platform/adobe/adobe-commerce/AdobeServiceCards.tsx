@@ -7,72 +7,28 @@ const BRAND = {
   secondary: "#F07800",
 };
 
-interface ServiceItem {
+export interface ServiceItem {
   title?: string;
   description?: string;
   url?: string;
 }
 
-interface ContentfulResponse {
-  data?: {
-    platformAdobeCommerces?: {
-      adobeServiceCollection?: {
-        items?: ServiceItem[];
-      };
-    };
-  };
+interface AdobeServiceCardsProps {
+  initialServices?: ServiceItem[];
 }
 
-export default function AdobeServiceCards() {
-  const [services, setServices] = useState<ServiceItem[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function AdobeServiceCards({
+  initialServices = [],
+}: AdobeServiceCardsProps) {
+  const [services, setServices] = useState<ServiceItem[]>(initialServices);
+  const [loading, setLoading] = useState(initialServices.length === 0);
 
   useEffect(() => {
-    const fetchServices = async () => {
-      try {
-        const response = await fetch(
-          "https://graphql.contentful.com/content/v1/spaces/pj0maraabon4/environments/production",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization:
-                "Bearer 6t-wgSsZnD80bBuG3_VNcGKE0lF-LAE7EPa5NE286HU",
-            },
-            body: JSON.stringify({
-              query: `
-                query {
-                  platformAdobeCommerces(id:"231JBLMJLXr5L3FUHFNGEI") {
-                    adobeServiceCollection {
-                      items {
-                        title
-                        description
-                        url
-                      }
-                    }
-                  }
-                }
-              `,
-            }),
-          }
-        );
-
-        const result: ContentfulResponse = await response.json();
-
-        const items =
-          result?.data?.platformAdobeCommerces
-            ?.adobeServiceCollection?.items ?? [];
-
-        setServices(items);
-      } catch (error) {
-        console.error("Service Fetch Error:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchServices();
-  }, []);
+    if (initialServices.length > 0) {
+      setServices(initialServices);
+      setLoading(false);
+    }
+  }, [initialServices]);
 
   return (
     <section className="relative py-8 lg:py-10 px-6 md:px-12 bg-black text-white overflow-hidden">

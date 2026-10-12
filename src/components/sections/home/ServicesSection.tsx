@@ -8,7 +8,7 @@ import { fadeContainer, fadeUpItem } from "@/src/lib/animations";
 type Service = {
   id: number;
   title: string;
-  description:string;
+  description: string;
   href: string;
 };
 
@@ -16,31 +16,31 @@ const services: Service[] = [
   {
     id: 1,
     title: "Adobe Workfront ",
-    description:"For strategic work management and project ",
+    description: "For strategic work management and project ",
     href: "/platform/adobe/workfront",
   },
   {
     id: 2,
     title: "Adobe Workfront Fusion",
-    description:"for intelligent automation and seamless workflow orchestration ",
+    description: "for intelligent automation and seamless workflow orchestration ",
     href: "/platform/adobe/workfront-fusion",
   },
   {
     id: 3,
     title: "Aprimo DAM",
-    description:" for enterprise-grade digital asset management and content governance ",
+    description: " for enterprise-grade digital asset management and content governance ",
     href: "/platform/aprimo",
   },
   {
     id: 4,
     title: "Salesforce",
-    description:"for CRM, marketing automation, commerce, and customer experience excellence ",
+    description: "for CRM, marketing automation, commerce, and customer experience excellence ",
     href: "/platform/salesforce",
   },
   {
     id: 5,
     title: "Adobe Stack",
-    description:"including AEM, Analytics, Experience Manager, Commerce Cloud, AEP, AJO and more",
+    description: "including AEM, Analytics, Experience Manager, Commerce Cloud, AEP, AJO and more",
     href: "/platform/adobe/adobe-aem",
   },
 ];
@@ -86,7 +86,7 @@ export default function ServicesSection() {
               variants={fadeUpItem}
               className="text-3xl font-semibold text-white sm:text-4xl"
             >
-             Adobe
+              Adobe
             </motion.h2>
 
             <motion.p
@@ -126,18 +126,18 @@ export default function ServicesSection() {
                   >
                     <div className="block items-center gap-4">
                       <div className="flex items-center gap-4">
-                      <span
-                        className="text-orange-500 font-semibold"
-                        aria-hidden="true"
-                      >
-                        {service.id.toString().padStart(2, "0")}
-                      </span>
+                        <span
+                          className="text-orange-500 font-semibold"
+                          aria-hidden="true"
+                        >
+                          {service.id.toString().padStart(2, "0")}
+                        </span>
 
-                      <h3 className="text-sm font-medium text-white sm:text-base">
-                        {service.title}
-                      </h3>
+                        <h3 className="text-sm font-medium text-white sm:text-base">
+                          {service.title}
+                        </h3>
                       </div>
-                     
+
                     </div>
 
                     <span
@@ -158,7 +158,7 @@ export default function ServicesSection() {
             className="relative overflow-hidden rounded-3xl justify-items-center"
           >
             <Image
-              src="https://admin.dluxtech.com/api/media/file/69e73eb1a2ec1c8ec6512880"
+              src="https://images.ctfassets.net/pj0maraabon4/6X4dk9xrZn8wj8Bl2EfrEF/48789dd81cac03b87ec8eb415d78ae75/our-sevices-card-image.webp"
               alt="DLUX team collaborating on enterprise Martech solutions using Adobe, Salesforce, and AI-driven digital transformation platforms"
               title="DLUX Martech Services and Digital Transformation Solutions"
               width={200}

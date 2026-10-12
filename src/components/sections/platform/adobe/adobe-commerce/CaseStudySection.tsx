@@ -7,7 +7,7 @@ const BRAND = {
   primary: "#FF3901",
 };
 
-interface CaseStudyItem {
+export interface CaseStudyItem {
   title: string;
   slug: string;
   client?: string;
@@ -17,67 +17,23 @@ interface CaseStudyItem {
   };
 }
 
-export default function CaseStudySection() {
-  const [caseStudies, setCaseStudies] = useState<CaseStudyItem[]>([]);
-  const [loading, setLoading] = useState(true);
+interface CaseStudySectionProps {
+  initialCaseStudies?: CaseStudyItem[];
+}
+
+export default function CaseStudySection({
+  initialCaseStudies = [],
+}: CaseStudySectionProps) {
+  const [caseStudies, setCaseStudies] =
+    useState<CaseStudyItem[]>(initialCaseStudies);
+  const [loading, setLoading] = useState(initialCaseStudies.length === 0);
 
   useEffect(() => {
-    const controller = new AbortController();
-
-    const fetchCaseStudies = async () => {
-      try {
-        const res = await fetch(
-          "https://graphql.contentful.com/content/v1/spaces/pj0maraabon4/environments/production",
-          {
-            method: "POST",
-            signal: controller.signal,
-            headers: {
-              "Content-Type": "application/json",
-              Authorization:
-                "Bearer 6t-wgSsZnD80bBuG3_VNcGKE0lF-LAE7EPa5NE286HU",
-            },
-            body: JSON.stringify({
-              query: `
-                query {
-                  caseStudyCollection(limit: 3) {
-                    items {
-                      title
-                      slug
-                      client
-                      shortDescription
-                      banner { url }
-                    }
-                  }
-                }
-              `,
-            }),
-          }
-        );
-
-        const json = await res.json();
-
-        console.log("LIST DATA:", json); // ✅ debug
-
-        const items = json?.data?.caseStudyCollection?.items ?? [];
-
-        setCaseStudies(
-          items.filter(
-            (item: CaseStudyItem) =>
-              item?.slug && item?.title
-          )
-        );
-      } catch (err: any) {
-        if (err.name !== "AbortError") {
-          console.error("Fetch Error:", err);
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCaseStudies();
-    return () => controller.abort();
-  }, []);
+    if (initialCaseStudies.length > 0) {
+      setCaseStudies(initialCaseStudies);
+      setLoading(false);
+    }
+  }, [initialCaseStudies]);
 
   const list = useMemo(() => caseStudies, [caseStudies]);
 

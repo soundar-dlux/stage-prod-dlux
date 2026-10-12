@@ -1,101 +1,90 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { notFound } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
+import type { Metadata } from "next";
+import {
+  getBlogBySlug,
+  getSuggestedBlogs,
+  getSidebarBlogs,
+  getBlogImageUrl,
+} from "@/src/lib/cms/blogs";
+import { sanitizeBlogHtml } from "@/src/lib/security/sanitize-blog-html";
 
-type Blog = {
-  _id: string;
-  title: string;
-  slug: string;
-  excerpt: string;
-  content: string;
-  featuredImage: string;
-  categories: string[];
-  publishDate: string;
-  createdAt: string;
-};
+interface Props {
+  params: Promise<{ detailUrlName: string }>;
+}
 
-export default function BlogDetailPage() {
-  const params = useParams();
-  const detailUrlName = params?.detailUrlName as string;
+const BLUR_PLACEHOLDER =
+  "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0nMTAwJScgaGVpZ2h0PScxMDAlJyBmaWxsPSIjMTExIiB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnLz4=";
 
-  const [blog, setBlog] = useState<Blog | null>(null);
-  const [allBlogs, setAllBlogs] = useState<Blog[]>([]);
-  const [loading, setLoading] = useState(true);
+/**
+ * Dynamically generates metadata for SEO and OpenGraph tags from the blog post.
+ */
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { detailUrlName } = await params;
+  if (!detailUrlName) {
+    return { title: "Blog | DLUX Tech" };
+  }
 
-  const getImageUrl = (url: string) => {
-    if (!url) return "";
-    return (url.startsWith("http") || url.startsWith("data:")) ? url : `https://admin.dluxtech.com${url}`;
+  const blog = await getBlogBySlug(detailUrlName);
+  if (!blog) {
+    return {
+      title: "Blog Post Not Found | DLUX Tech",
+      robots: { index: false, follow: false },
+    };
+  }
+
+  const imageUrl = getBlogImageUrl(blog.featuredImage);
+
+  return {
+    title: `${blog.title} | DLUX Tech`,
+    description: blog.excerpt || blog.title,
+    openGraph: {
+      title: blog.title,
+      description: blog.excerpt || blog.title,
+      url: `https://www.dluxtech.com/blog/${blog.slug}`,
+      siteName: "DLUX Tech",
+      type: "article",
+      images: imageUrl ? [{ url: imageUrl }] : [],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: blog.title,
+      description: blog.excerpt || blog.title,
+      images: imageUrl ? [imageUrl] : [],
+    },
   };
+}
 
-  const blurPlaceholder =
-    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0nMTAwJScgaGVpZ2h0PScxMDAlJyBmaWxsPSIjMTExIiB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnLz4=";
+export default async function BlogDetailPage({ params }: Props) {
+  const { detailUrlName } = await params;
 
-  useEffect(() => {
-    let isMounted = true;
-    const fetchData = async () => {
-      try {
-        const res = await fetch("https://admin.dluxtech.com/api/blogs?all=true");
-        const result = await res.json();
-        if (!isMounted) return;
+  if (!detailUrlName) {
+    return notFound();
+  }
 
-        if (result.success) {
-          const items: Blog[] = (result.blogs || []).map((b: any) => ({
-            ...b,
-            slug: b.slug ? b.slug.replace("httpswwwdluxtechcomblog", "") : "",
-          }));
-          const current = items.find((item) => item.slug === detailUrlName);
-          setBlog(current || null);
-          setAllBlogs(items);
-        }
-      } catch (err) {
-        console.error("Error fetching blog details:", err);
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
-    };
+  // Retrieve blog post using server-only loader
+  const blog = await getBlogBySlug(detailUrlName);
 
-    if (detailUrlName) fetchData();
+  if (!blog) {
+    return notFound();
+  }
 
-    return () => {
-      isMounted = false;
-    };
-  }, [detailUrlName]);
+  // Fetch suggested and sidebar blogs in parallel
+  const [suggested, sidebar] = await Promise.all([
+    getSuggestedBlogs(detailUrlName, 3),
+    getSidebarBlogs(detailUrlName, 5),
+  ]);
 
-  if (loading)
-    return (
-      <div className="text-center py-20 text-gray-400 bg-[#0b0b0b]">
-        Loading...
-      </div>
-    );
-
-  if (!blog)
-    return (
-      <div className="text-center py-20 text-gray-400 bg-[#0b0b0b]">
-        No content available.
-      </div>
-    );
-
-  const imageUrl = blog.featuredImage ? getImageUrl(blog.featuredImage) : "";
-
-  const suggested = allBlogs
-    .filter((item) => item.slug !== detailUrlName)
-    .slice(0, 3);
-
-  const sidebar = allBlogs
-    .filter((item) => item.slug !== detailUrlName)
-    .slice(0, 5);
+  // Enforce server-side HTML sanitization with the security allowlist
+  const safeContentHtml = sanitizeBlogHtml(blog.content);
+  const imageUrl = getBlogImageUrl(blog.featuredImage);
 
   return (
     <div className="bg-black min-h-screen text-white">
       <div className="max-w-[1400px] mx-auto px-6 md:px-10 lg:px-20 py-16 mt-[80px] grid grid-cols-1 lg:grid-cols-4 gap-10">
-
-        {/* MAIN */}
+        {/* MAIN COLUMN */}
         <div className="lg:col-span-3">
-
           {imageUrl && (
             <Image
               src={imageUrl}
@@ -104,96 +93,101 @@ export default function BlogDetailPage() {
               height={600}
               priority
               placeholder="blur"
-              blurDataURL={blurPlaceholder}
+              blurDataURL={BLUR_PLACEHOLDER}
               className="w-full object-cover rounded-xl mb-8"
             />
           )}
 
-          {/* 🔥 MAIN TITLE */}
+          {/* MAIN TITLE */}
           <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
             {blog.title}
           </h1>
 
-          <div
+          {/* SECURE SANITIZED BLOG CONTENT */}
+          <article
             className="blog-content-html"
-            dangerouslySetInnerHTML={{ __html: blog.content }}
+            dangerouslySetInnerHTML={{ __html: safeContentHtml }}
           />
 
-          {/* SUGGESTED */}
-          <div className="mt-16">
-            <h3 className="text-2xl md:text-3xl font-semibold mb-6 text-[#ff3901]">
-              You may also like
-            </h3>
+          {/* SUGGESTED ARTICLES */}
+          {suggested.length > 0 && (
+            <div className="mt-16">
+              <h3 className="text-2xl md:text-3xl font-semibold mb-6 text-[#ff3901]">
+                You may also like
+              </h3>
 
-            <div className="grid md:grid-cols-3 gap-6">
-              {suggested.map((item) => {
-                const img = item.featuredImage || "";
+              <div className="grid md:grid-cols-3 gap-6">
+                {suggested.map((item) => {
+                  const img = item.featuredImage
+                    ? getBlogImageUrl(item.featuredImage)
+                    : "";
 
-                return (
-                  <a
-                    key={item.slug}
-                    href={`/blog/${item.slug}`}
-                    className="bg-[#111] rounded-xl overflow-hidden border border-[#222] hover:border-[#ff3901] transition"
-                  >
-                    {img && (
-                      <Image
-                        src={getImageUrl(img)}
-                        alt={item.title}
-                        width={400}
-                        height={250}
-                        placeholder="blur"
-                        blurDataURL={blurPlaceholder}
-                        className="w-full h-[180px] object-cover"
-                      />
-                    )}
+                  return (
+                    <Link
+                      key={item.slug}
+                      href={`/blog/${item.slug}`}
+                      className="bg-[#111] rounded-xl overflow-hidden border border-[#222] hover:border-[#ff3901] transition"
+                    >
+                      {img && (
+                        <Image
+                          src={img}
+                          alt={item.title}
+                          width={400}
+                          height={250}
+                          placeholder="blur"
+                          blurDataURL={BLUR_PLACEHOLDER}
+                          className="w-full h-[180px] object-cover"
+                        />
+                      )}
 
-                    <div className="p-4">
-                      <h4 className="text-sm font-medium text-gray-300 hover:text-[#ff3901]">
-                        {item.title}
-                      </h4>
-                    </div>
-                  </a>
-                );
-              })}
+                      <div className="p-4">
+                        <h4 className="text-sm font-medium text-gray-300 hover:text-[#ff3901]">
+                          {item.title}
+                        </h4>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+
+              <div className="mt-8 text-center">
+                <Link
+                  href="/resources/blogs"
+                  className="inline-block bg-[#ff3901] hover:bg-[#e63200] px-6 py-3 rounded-lg font-medium transition"
+                >
+                  View More Blogs →
+                </Link>
+              </div>
             </div>
-
-            <div className="mt-8 text-center">
-              <a
-                href="/resources/blogs"
-                className="inline-block bg-[#ff3901] hover:bg-[#e63200] px-6 py-3 rounded-lg font-medium transition"
-              >
-                View More Blogs →
-              </a>
-            </div>
-          </div>
+          )}
         </div>
 
         {/* SIDEBAR */}
-        <div className="lg:col-span-1 space-y-6">
-
+        <aside className="lg:col-span-1 space-y-6">
           {/* Latest Posts */}
-          <div className="sticky top-24 bg-[#111] border border-[#222] rounded-xl p-5">
-            <h3 className="text-xl md:text-2xl font-semibold mb-4 text-[#ff3901]">
-              Latest Posts
-            </h3>
+          {sidebar.length > 0 && (
+            <div className="sticky top-24 bg-[#111] border border-[#222] rounded-xl p-5">
+              <h3 className="text-xl md:text-2xl font-semibold mb-4 text-[#ff3901]">
+                Latest Posts
+              </h3>
 
-            <div className="space-y-4">
-              {sidebar.map((item) => (
-                <a
-                  key={item.slug}
-                  href={`/blog/${item.slug}`}
-                  className="block text-sm text-gray-300 hover:text-[#ff3901]"
-                >
-                  • {item.title}
-                </a>
-              ))}
+              <div className="space-y-4">
+                {sidebar.map((item) => (
+                  <Link
+                    key={item.slug}
+                    href={`/blog/${item.slug}`}
+                    className="block text-sm text-gray-300 hover:text-[#ff3901] transition"
+                  >
+                    • {item.title}
+                  </Link>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* CONTACT CTA */}
           <div className="sticky top-[300px]">
             <div className="bg-gradient-to-br from-[#111] to-[#0d0d0d] border border-[#222] rounded-xl p-6 shadow-lg">
-
               <p className="text-[#ff3901] text-sm mb-2 font-medium">
                 📩 Business Enquiries
               </p>
@@ -203,7 +197,8 @@ export default function BlogDetailPage() {
               </h3>
 
               <p className="text-sm text-gray-400 leading-6 mb-5">
-                Reach out at <span className="text-white font-medium">sales@dluxtech.com</span>
+                Reach out at{" "}
+                <span className="text-white font-medium">sales@dluxtech.com</span>
               </p>
 
               <a
@@ -218,8 +213,7 @@ export default function BlogDetailPage() {
               </p>
             </div>
           </div>
-
-        </div>
+        </aside>
       </div>
     </div>
   );

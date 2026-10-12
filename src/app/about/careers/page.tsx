@@ -5,6 +5,8 @@ import HeroSection from "@/src/components/sections/About/careers/HeroSection";
 import InternshipSection from "@/src/components/sections/About/careers/InternshipSection";
 import OurCultureSection from "@/src/components/sections/About/careers/OurCultureSection";
 import EmployeeSpeaksSection from "@/src/components/sections/About/careers/EmployeeSpeaksInfinite";
+import { fetchCareersGallery } from "@/src/lib/contentful/careers-gallery";
+import { fetchContentfulGraphQL } from "@/src/lib/contentful/server-client";
 
 export const metadata: Metadata = {
   title: "Careers | Digital Consulting Services | DLUX",
@@ -22,44 +24,32 @@ interface Testimonial {
 }
 
 async function getTestimonials(): Promise<Testimonial[]> {
-  try {
-    const res = await fetch(
-      `https://graphql.contentful.com/content/v1/spaces/${process.env.CONTENTFUL_SPACE_ID}/environments/production`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.CONTENTFUL_ACCESS_TOKEN}`,
-        },
-        body: JSON.stringify({
-          query: `
-            query {
-              resourceTestimonialsCollection {
-                items {
-                  name
-                  position
-                  testimonials
-                  avatar { url }
-                }
-              }
-            }
-          `,
-        }),
-        cache: "no-store",
+  const data = await fetchContentfulGraphQL<{
+    resourceTestimonialsCollection?: { items?: Testimonial[] };
+  }>(
+    `
+      query {
+        resourceTestimonialsCollection {
+          items {
+            name
+            position
+            testimonials
+            avatar { url }
+          }
+        }
       }
-    );
+    `,
+    { revalidate: 60 }
+  );
 
-    const json = await res.json();
-
-    return json?.data?.resourceTestimonialsCollection?.items ?? [];
-  } catch (error) {
-    console.error("Testimonial fetch error:", error);
-    return [];
-  }
+  return data?.resourceTestimonialsCollection?.items ?? [];
 }
 
 export default async function Careers() {
-  const testimonials = await getTestimonials();
+  const [galleryImages, testimonials] = await Promise.all([
+    fetchCareersGallery(),
+    getTestimonials(),
+  ]);
 
   return (
     <main className="w-full bg-black">
@@ -67,7 +57,7 @@ export default async function Careers() {
       <BuildCareerSection />
       <InternshipSection />
       <OurCultureSection />
-      <GallerySection />
+      <GallerySection initialImages={galleryImages} />
       <EmployeeSpeaksSection />
     </main>
   );

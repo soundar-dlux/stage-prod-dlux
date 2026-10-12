@@ -5,21 +5,26 @@ import CommonVideoModal from "@/src/components/ui/modal/CommonVideoModal";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ChevronLeft, ChevronRight, Play } from "lucide-react";
+import { isSafeVideoUrl } from "@/src/lib/security/content-urls";
 
 const BRAND = {
   primary: "#FF3901",
   secondary: "#F07800",
 };
 
-interface VideoItem {
+export interface VideoItem {
   id: string;
   poster?: string;
   title?: string;
   url?: string;
 }
 
-export default function CoeVideos() {
-  const [videos, setVideos] = useState<VideoItem[]>([]);
+interface CoeVideosProps {
+  initialVideos?: VideoItem[];
+}
+
+export default function CoeVideos({ initialVideos = [] }: CoeVideosProps) {
+  const [videos, setVideos] = useState<VideoItem[]>(initialVideos);
   const [current, setCurrent] = useState(0);
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
   const [isHovering, setIsHovering] = useState(false);
@@ -41,60 +46,11 @@ export default function CoeVideos() {
   const offsetX = isMobile ? 85 : isTablet ? 140 : 220;
   const offsetFarX = isMobile ? 140 : isTablet ? 250 : 380;
 
-  /* Fetch videos from Contentful */
   useEffect(() => {
-    const controller = new AbortController();
-
-    const fetchVideos = async () => {
-      try {
-        const res = await fetch(
-          "https://graphql.contentful.com/content/v1/spaces/pj0maraabon4/environments/production",
-          {
-            method: "POST",
-            signal: controller.signal,
-            headers: {
-              "Content-Type": "application/json",
-              Authorization:
-                "Bearer 6t-wgSsZnD80bBuG3_VNcGKE0lF-LAE7EPa5NE286HU",
-            },
-            body: JSON.stringify({
-              query: `
-                query {
-                  commerceVideosCollection {
-                    items {
-                      sys { id }
-                      title
-                      video
-                      image { url }
-                    }
-                  }
-                }
-              `,
-            }),
-          }
-        );
-
-        const json = await res.json();
-        const items = json?.data?.commerceVideosCollection?.items ?? [];
-
-        setVideos(
-          items.map((item: any) => ({
-            id: item.sys.id,
-            poster: item.image?.url,
-            title: item.title,
-            url: item.video,
-          }))
-        );
-      } catch (err: any) {
-        if (err.name !== "AbortError") {
-          console.error("Fetch error:", err);
-        }
-      }
-    };
-
-    fetchVideos();
-    return () => controller.abort();
-  }, []);
+    if (initialVideos.length > 0) {
+      setVideos(initialVideos);
+    }
+  }, [initialVideos]);
 
   /* Navigation callbacks */
   const nextSlide = useCallback(() => {
@@ -240,7 +196,7 @@ export default function CoeVideos() {
   }, [videos.length]);
 
   const openVideo = useCallback((url?: string) => {
-    if (!url) return;
+    if (!url || !isSafeVideoUrl(url)) return;
     setSelectedVideo(url);
   }, []);
 

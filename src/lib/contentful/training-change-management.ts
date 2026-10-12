@@ -1,3 +1,4 @@
+import "server-only";
 import { TRAINING_CHANGE_MANAGEMENT_QUERY } from "@/src/app/services/training-&-change-management/queries";
 import { TrainingChangeManagementData } from "@/src/app/services/training-&-change-management/types";
 

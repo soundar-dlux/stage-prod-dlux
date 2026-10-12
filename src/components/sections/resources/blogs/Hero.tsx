@@ -2,55 +2,21 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
-import { GraphQLClient, gql } from "graphql-request";
 import { FaArrowRight } from "react-icons/fa6";
 
-const endpoint =
-  "https://graphql.contentful.com/content/v1/spaces/pj0maraabon4/environments/production";
+interface HeroProps {
+  initialBanners?: string[];
+}
 
-const client = new GraphQLClient(endpoint, {
-  headers: {
-    Authorization: `Bearer 6t-wgSsZnD80bBuG3_VNcGKE0lF-LAE7EPa5NE286HU`,
-  },
-});
-
-const query = gql`
-  query {
-    blogPageCollection {
-      items {
-        heroBannerCollection {
-          items {
-            url
-          }
-        }
-      }
-    }
-  }
-`;
-
-const Hero: React.FC = () => {
-  const [heroBanners, setHeroBanners] = useState<string[]>([]);
+const Hero: React.FC<HeroProps> = ({ initialBanners = [] }) => {
+  const [heroBanners, setHeroBanners] = useState<string[]>(initialBanners);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Fetch once
   useEffect(() => {
-    const fetchHeroBanners = async () => {
-      try {
-        const data: any = await client.request(query);
-
-        const urls =
-          data.blogPageCollection.items[0]?.heroBannerCollection?.items.map(
-            (item: any) => item.url
-          ) || [];
-
-        setHeroBanners(urls);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    fetchHeroBanners();
-  }, []);
+    if (initialBanners.length > 0) {
+      setHeroBanners(initialBanners);
+    }
+  }, [initialBanners]);
 
   // Auto slide
   useEffect(() => {

@@ -5,13 +5,14 @@ import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import gsap from "gsap";
 import { ChevronLeft, ChevronRight, Play, ShoppingBag } from "lucide-react";
 import Link from "next/link";
+import { isSafeVideoUrl } from "@/src/lib/security/content-urls";
 
 const BRAND = {
   primary: "#FF3901",
   secondary: "#F07800",
 };
 
-interface Slide {
+export interface Slide {
   id: string;
   title?: string;
   description?: string;
@@ -19,8 +20,12 @@ interface Slide {
   image?: string;
 }
 
-export default function PremiumBanner() {
-  const [slides, setSlides] = useState<Slide[]>([]);
+interface BannerProps {
+  initialSlides?: Slide[];
+}
+
+export default function PremiumBanner({ initialSlides = [] }: BannerProps) {
+  const [slides, setSlides] = useState<Slide[]>(initialSlides);
   const [current, setCurrent] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -30,62 +35,11 @@ export default function PremiumBanner() {
   const progressRef = useRef<HTMLDivElement>(null);
   const progressBarTween = useRef<gsap.core.Tween | null>(null);
 
-  /* Fetch Slides from Contentful */
   useEffect(() => {
-    const controller = new AbortController();
-
-    const fetchSlides = async () => {
-      try {
-        const res = await fetch(
-          "https://graphql.contentful.com/content/v1/spaces/pj0maraabon4/environments/production",
-          {
-            method: "POST",
-            signal: controller.signal,
-            headers: {
-              "Content-Type": "application/json",
-              Authorization:
-                "Bearer 6t-wgSsZnD80bBuG3_VNcGKE0lF-LAE7EPa5NE286HU",
-            },
-            body: JSON.stringify({
-              query: `
-              query {
-                commerceVideosCollection {
-                  items {
-                    sys { id }
-                    title
-                    description
-                    video
-                    image { url }
-                  }
-                }
-              }
-            `,
-            }),
-          }
-        );
-
-        const json = await res.json();
-        const items = json?.data?.commerceVideosCollection?.items ?? [];
-
-        setSlides(
-          items.slice(-3).map((item: any) => ({
-            id: item.sys.id,
-            title: item.title,
-            description: item.description,
-            video: item.video,
-            image: item.image?.url,
-          }))
-        );
-      } catch (err: any) {
-        if (err.name !== "AbortError") {
-          console.error("Fetch error:", err);
-        }
-      }
-    };
-
-    fetchSlides();
-    return () => controller.abort();
-  }, []);
+    if (initialSlides.length > 0) {
+      setSlides(initialSlides);
+    }
+  }, [initialSlides]);
 
   /* Navigation Callbacks */
   const nextSlide = useCallback(() => {
@@ -180,7 +134,7 @@ export default function PremiumBanner() {
   }, [current, slides.length]);
 
   const handleOpenModal = useCallback((video?: string) => {
-    if (!video) return;
+    if (!video || !isSafeVideoUrl(video)) return;
     setSelectedVideo(video);
     setModalOpen(true);
   }, []);

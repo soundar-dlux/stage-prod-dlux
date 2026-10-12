@@ -5,50 +5,48 @@ import { motion } from "framer-motion";
 import { useEffect } from "react";
 import { Mail, MapIcon, Phone } from "lucide-react";
 import Image from "next/image";
+import {
+  validateFormResizeMessage,
+  DEFAULT_FORM_ORIGIN,
+  DEFAULT_FORM_ID,
+} from "@/src/lib/security/form-message";
 
+const FORM_ID = DEFAULT_FORM_ID;
+const FORM_CONTAINER_ID = `zf_div_${FORM_ID}`;
+const FORM_SRC = `${DEFAULT_FORM_ORIGIN}/dluxtech/form/ContactUs/formperma/${FORM_ID}?zf_rszfm=1`;
 
 export default function ContactFormSection() {
   useEffect(() => {
-    const container = document.getElementById(
-      "zf_div_yDN6eKbrtAH11RME4LZgO6s-M8ogDvOaP693n-cytaQ"
-    );
+    const container = document.getElementById(FORM_CONTAINER_ID);
+    if (!container) return;
 
-    if (!container || container.querySelector("iframe")) return;
-
-    const iframe = document.createElement("iframe");
-
-    iframe.src =
-      "https://forms.dluxtech.com/dluxtech/form/ContactUs/formperma/yDN6eKbrtAH11RME4LZgO6s-M8ogDvOaP693n-cytaQ?zf_rszfm=1";
-
-    iframe.style.border = "none";
-    iframe.style.width = "100%";
-    iframe.style.height = "800px";
-    iframe.setAttribute("aria-label", "Contact Us");
-
-    container.appendChild(iframe);
+    let iframe = container.querySelector("iframe");
+    if (!iframe) {
+      iframe = document.createElement("iframe");
+      iframe.src = FORM_SRC;
+      iframe.style.border = "none";
+      iframe.style.width = "100%";
+      iframe.style.height = "800px";
+      iframe.setAttribute("aria-label", "Contact Us");
+      container.appendChild(iframe);
+    }
 
     const handleMessage = (event: MessageEvent) => {
-      const evntData = event.data;
+      const targetWindow = iframe?.contentWindow ?? null;
 
-      if (typeof evntData !== "string") return;
+      const validation = validateFormResizeMessage({
+        event,
+        expectedOrigin: DEFAULT_FORM_ORIGIN,
+        expectedSourceWindow: targetWindow,
+        expectedFormId: FORM_ID,
+      });
 
-      const zf_ifrm_data = evntData.split("|");
+      if (!validation.isValid || !validation.formattedHeight) {
+        return;
+      }
 
-      if (zf_ifrm_data.length < 2) return;
-
-      const zf_perma = zf_ifrm_data[0];
-      const newHeight =
-        parseInt(zf_ifrm_data[1], 10) + 15 + "px";
-
-      const iframe =
-        container.getElementsByTagName("iframe")[0];
-
-      if (
-        iframe &&
-        iframe.src.includes("formperma") &&
-        iframe.src.includes(zf_perma)
-      ) {
-        iframe.style.height = newHeight;
+      if (iframe) {
+        iframe.style.height = validation.formattedHeight;
       }
     };
 

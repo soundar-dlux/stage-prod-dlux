@@ -1,5 +1,4 @@
-// lib/contentful/clients.api.ts
-
+import "server-only";
 import { CLIENTS_QUERY } from "@/src/components/ui/ClientLogo/query";
 import { ClientsData, ClientsResponse } from "@/src/components/ui/ClientLogo/types";
 
@@ -8,13 +7,18 @@ import { ClientsData, ClientsResponse } from "@/src/components/ui/ClientLogo/typ
 =========================== */
 const SPACE_ID = process.env.CONTENTFUL_SPACE_ID!;
 const ACCESS_TOKEN = process.env.CONTENTFUL_ACCESS_TOKEN!;
-const ENVIRONMENT = "production"; // change if needed
+const ENVIRONMENT = process.env.CONTENTFUL_ENVIRONMENT || "production";
 
 /* ===========================
    FETCH CLIENTS
 =========================== */
 export async function fetchClients(): Promise<ClientsData | null> {
   try {
+    if (!SPACE_ID || !ACCESS_TOKEN) {
+      console.warn("[ClientsLogo] Contentful credentials missing in environment variables.");
+      return null;
+    }
+
     const res = await fetch(
       `https://graphql.contentful.com/content/v1/spaces/${SPACE_ID}/environments/${ENVIRONMENT}`,
       {
@@ -24,7 +28,7 @@ export async function fetchClients(): Promise<ClientsData | null> {
           Authorization: `Bearer ${ACCESS_TOKEN}`,
         },
         body: JSON.stringify({ query: CLIENTS_QUERY }),
-        cache: "no-store", // or use "force-cache" / revalidate if needed
+        next: { revalidate: 60 },
       }
     );
 
