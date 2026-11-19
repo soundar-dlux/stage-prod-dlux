@@ -13,6 +13,15 @@ export const metadata = {
 
 export default async function ManagedApplicationServicesPage() {
   const data = await fetchManagedApplicationServices();
+  if (!data) {
+    return (
+      <main className="p-10 text-center">
+        <h1 className="text-2xl font-bold">Managed Application Services</h1>
+        <p>Page data not available.</p>
+      </main>
+    );
+  }
+
   const amsImages =
     data.ManagedApplicationPage_AMSReinvented.dluxServiceImageManyCollection
       ?.items ?? [];

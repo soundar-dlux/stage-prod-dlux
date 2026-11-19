@@ -68,7 +68,6 @@ export default function StoryDetailClient({ story, relatedStories }: Props) {
           email: formData.email,
           phone: formData.phone,
           slug: story?.slug,
-          pdfUrl: story?.caseStudyPdf?.url,
         }),
       });
 

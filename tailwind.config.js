@@ -23,6 +23,10 @@ module.exports = {
           gradientFrom: "#FF3901",
           gradientTo: "#F07800",
         },
+        subGradientText: {
+          from: "#FE780C",
+          to: "#FE3908",
+        },
         surface: {
           dark: "#000000",
           light: "#171717",
@@ -33,6 +37,7 @@ module.exports = {
 
       fontFamily: {
         sans: ["var(--font-open-sans)", "sans-serif"], // DEFAULT FONT
+        helios: ["Heliosext", "sans-serif"],
       },
       fontSize: {
         none: [pxToRem(0)],

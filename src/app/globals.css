@@ -13,6 +13,7 @@ body{
     background: linear-gradient(90deg, #FE780C 0%, #FE3908 100%);
 }
 
+
 @keyframes slowFloat {
   0% { transform: translate(0px, 0px); }
   50% { transform: translate(30px, 25px); }
@@ -372,3 +373,24 @@ body{
   font-weight: 600;
 }
 
+
+
+@keyframes starburst-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-starburst {
+  animation: starburst-spin 0.8s steps(8) infinite;
+  transform-origin: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-starburst {
+    animation: none !important;
+  }
+}

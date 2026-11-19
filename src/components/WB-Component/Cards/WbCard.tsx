@@ -3,14 +3,21 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
+import NavCTAButton from "../Buttons/CTA/NavCta";
 
 export interface WbCardProps {
+  /** Optional icon rendered above the title */
+  icon?: React.ReactNode;
   /** Main category / badge title (default: "RT CDP") */
   title?: React.ReactNode;
+  /** Custom CSS classes for the title element */
+  titleClassName?: string;
   /** Subtitle / headline (default: "Real-Time\nCDP") */
   subtitle?: React.ReactNode;
   /** Body description content */
   description?: React.ReactNode;
+  /** Custom CSS classes for the description element */
+  descriptionClassName?: string;
   /** Text for the CTA button (default: "Read More") */
   buttonText?: string;
   /** Target URL for button link */
@@ -27,6 +34,8 @@ export interface WbCardProps {
   topRightContent?: React.ReactNode;
   /** Custom icon for the button (default: ArrowRight) */
   buttonIcon?: React.ReactNode;
+  /** Custom card background color or gradient string (default: "#ffffff") */
+  cardBackground?: string;
 
   // --- Exact Card Dimension & Style Specs ---
   /** Card width in px or CSS string (default: 400) */
@@ -58,6 +67,8 @@ export interface WbCardProps {
   className?: string;
   /** Inline style overrides */
   style?: React.CSSProperties;
+  /** Optional children rendered inside card */
+  children?: React.ReactNode;
 }
 
 /**
@@ -99,15 +110,18 @@ function DecorativeDots() {
 }
 
 export function WbCard({
+  icon,
   title = "RT CDP",
-  subtitle = (
+  titleClassName,
+  subtitle = title === "RT CDP" ? (
     <>
       Real-Time
       <br />
       CDP
     </>
-  ),
+  ) : undefined,
   description = "Unify known andanonymous data into real-time customer profiles for activation across channels.",
+  descriptionClassName,
   buttonText = "Read More",
   buttonHref,
   onButtonClick,
@@ -116,6 +130,7 @@ export function WbCard({
   showDots = true,
   topRightContent,
   buttonIcon,
+  cardBackground,
 
   width = 400,
   height = 350,
@@ -132,6 +147,7 @@ export function WbCard({
 
   className = "",
   style = {},
+  children,
 }: WbCardProps) {
   const widthVal = typeof width === "number" ? `${width}px` : width;
   const heightVal = typeof height === "number" ? `${height}px` : height;
@@ -159,10 +175,16 @@ export function WbCard({
   // Check if gradient border should be used (default or when borderColor is 'gradient' or default '#FF7B54')
   const isGradientBorder = !borderColor || borderColor === "gradient" || borderColor === "#FF7B54";
 
+  const innerBg = cardBackground
+    ? cardBackground.includes("gradient")
+      ? cardBackground
+      : `linear-gradient(${cardBackground}, ${cardBackground})`
+    : "linear-gradient(#ffffff, #ffffff)";
+
   const borderStyles: React.CSSProperties = isGradientBorder
     ? {
         border: `${borderWidth} solid transparent`,
-        backgroundImage: `linear-gradient(#ffffff, #ffffff), linear-gradient(131.12deg, #FFFFFF -0.61%, #E13207 126.86%)`,
+        backgroundImage: `${innerBg}, linear-gradient(131.12deg, #FFFFFF -0.61%, #E13207 126.86%)`,
         backgroundOrigin: "border-box",
         backgroundClip: "padding-box, border-box",
       }
@@ -170,6 +192,7 @@ export function WbCard({
         borderWidth,
         borderColor,
         borderStyle: "solid",
+        ...(cardBackground ? { background: cardBackground } : {}),
       };
 
   return (
@@ -206,8 +229,14 @@ export function WbCard({
       {/* 🔹 TOP SECTION: Title, Subtitle & Decorative Dots */}
       <div className="flex items-start justify-between w-full gap-2">
         <div className="flex flex-col">
+          {icon && <div className="mb-4 sm:mb-6">{icon}</div>}
           {title && (
-            <h3 className="text-[#FF4F00] font-extrabold text-2xl sm:text-[32px] leading-none tracking-tight uppercase">
+            <h3
+              className={
+                titleClassName ||
+                "text-[#FF4F00] font-extrabold text-2xl sm:text-[32px] leading-none tracking-tight uppercase"
+              }
+            >
               {title}
             </h3>
           )}
@@ -228,10 +257,17 @@ export function WbCard({
 
       {/* 🔹 MIDDLE SECTION: Description */}
       {description && (
-        <p className="text-[#666666] text-xs sm:text-[14px] leading-relaxed font-normal max-w-[310px]">
+        <p
+          className={
+            descriptionClassName ||
+            "text-[#666666] text-xs sm:text-[14px] leading-relaxed font-normal max-w-[310px]"
+          }
+        >
           {description}
         </p>
       )}
+
+      {children}
 
       {/* 🔹 BOTTOM SECTION: Action Button */}
       {showButton && (
@@ -245,13 +281,13 @@ export function WbCard({
               {ButtonContent}
             </a>
           ) : (
-            <button
+            <NavCTAButton
               type="button"
               onClick={onButtonClick}
               className="inline-block bg-transparent border-none p-0 cursor-pointer focus:outline-none"
             >
               {ButtonContent}
-            </button>
+            </NavCTAButton>
           )}
         </div>
       )}

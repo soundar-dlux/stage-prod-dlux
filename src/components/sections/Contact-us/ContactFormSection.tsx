@@ -9,6 +9,7 @@ import {
   validateFormResizeMessage,
   DEFAULT_FORM_ORIGIN,
   DEFAULT_FORM_ID,
+  SECURE_IFRAME_ATTRIBUTES,
 } from "@/src/lib/security/form-message";
 
 const FORM_ID = DEFAULT_FORM_ID;
@@ -28,8 +29,17 @@ export default function ContactFormSection() {
       iframe.style.width = "100%";
       iframe.style.height = "800px";
       iframe.setAttribute("aria-label", "Contact Us");
+
+      // Highest Security: Sandboxing & Referrer Policy
+      iframe.setAttribute("sandbox", SECURE_IFRAME_ATTRIBUTES.sandbox);
+      iframe.setAttribute("referrerpolicy", SECURE_IFRAME_ATTRIBUTES.referrerPolicy);
+      iframe.setAttribute("loading", SECURE_IFRAME_ATTRIBUTES.loading);
+
       container.appendChild(iframe);
     }
+
+    let lastAppliedHeight = 800;
+    let rafId: number | null = null;
 
     const handleMessage = (event: MessageEvent) => {
       const targetWindow = iframe?.contentWindow ?? null;
@@ -41,19 +51,39 @@ export default function ContactFormSection() {
         expectedFormId: FORM_ID,
       });
 
-      if (!validation.isValid || !validation.formattedHeight) {
+      if (!validation.isValid || !validation.heightPx || !validation.formattedHeight) {
         return;
       }
 
-      if (iframe) {
-        iframe.style.height = validation.formattedHeight;
+      // Layout Flooding & Thrashing Protection:
+      // Ignore insignificant micro-changes (< 2px) and batch via requestAnimationFrame
+      if (Math.abs(validation.heightPx - lastAppliedHeight) < 2) {
+        return;
       }
+
+      const targetHeight = validation.formattedHeight;
+      const targetHeightPx = validation.heightPx;
+
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+      }
+
+      rafId = requestAnimationFrame(() => {
+        if (iframe) {
+          iframe.style.height = targetHeight;
+          lastAppliedHeight = targetHeightPx;
+        }
+        rafId = null;
+      });
     };
 
     window.addEventListener("message", handleMessage);
 
     return () => {
       window.removeEventListener("message", handleMessage);
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+      }
     };
   }, []);
 

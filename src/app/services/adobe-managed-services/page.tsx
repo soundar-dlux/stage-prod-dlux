@@ -29,6 +29,15 @@ import ContactSection3D from "@/src/components/ui/modal/contact-cta";
 
 export default async function AdobeWorkfrontManagedServicesPage() {
   const data = await fetchAdobeWorkfrontManagedServices();
+  if (!data) {
+    return (
+      <main className="p-10 text-center">
+        <h1 className="text-2xl font-bold">Adobe Managed Services</h1>
+        <p>Page data not available.</p>
+      </main>
+    );
+  }
+
   const testimonials = [
     {
       paragraph: data.dluxClientReview[0].clientParagraph,

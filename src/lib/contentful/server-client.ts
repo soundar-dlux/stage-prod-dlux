@@ -23,7 +23,12 @@ export function getContentfulConfig(): ContentfulConfig {
   const accessToken = process.env.CONTENTFUL_ACCESS_TOKEN;
   const environment = process.env.CONTENTFUL_ENVIRONMENT || "production";
 
-  if (!spaceId || !accessToken) {
+  const isPlaceholder = Boolean(
+    accessToken &&
+      (accessToken.includes("placeholder") || accessToken.startsWith("your_"))
+  );
+
+  if (!spaceId || !accessToken || isPlaceholder) {
     return {
       isConfigured: false,
       spaceId: spaceId || "",
@@ -58,7 +63,7 @@ export async function fetchContentfulGraphQL<T = any>(
 
   if (!config.isConfigured) {
     console.warn(
-      "[Contentful Server Client] Missing CONTENTFUL_SPACE_ID or CONTENTFUL_ACCESS_TOKEN in environment variables."
+      "[Contentful Server Client] Contentful credentials missing or unconfigured placeholder in environment variables."
     );
     return null;
   }

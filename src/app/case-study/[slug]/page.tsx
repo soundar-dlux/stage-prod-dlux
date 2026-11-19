@@ -132,7 +132,7 @@ export default async function Page({
         <div className="space-y-12">
 
           {/* ONLY ACTIONS (NO BIG BUTTON) */}
-          <CaseStudyActions slug={data.slug || slug} pdfUrl={data.caseStudyPdf?.url} />
+          <CaseStudyActions slug={data.slug || slug} />
 
           {data.summary && (
             <Section title="Executive Summary">{data.summary}</Section>

@@ -1,6 +1,17 @@
+import "server-only";
 import crypto from "node:crypto";
+import fs from "node:fs";
+import path from "node:path";
 import { getSafePdfUrl } from "@/src/lib/security/content-urls";
 import { fetchContentfulGraphQL } from "@/src/lib/contentful/server-client";
+import {
+  TokenStore,
+  TokenUsage,
+  RateLimitStore,
+  RateLimitResult,
+  createDefaultTokenStore,
+  createDefaultRateLimitStore,
+} from "./storage";
 
 /**
  * S05 Security Remediation - Server-side Download & Access Gating
@@ -11,15 +22,19 @@ import { fetchContentfulGraphQL } from "@/src/lib/contentful/server-client";
  * 3. Token-based delivery: Downloads require an HMAC-signed, expiring authorization token.
  * 4. Safe URL validation: Assets must pass strict host and extension allowlisting.
  * 5. Abuse prevention: In-memory rate limiting and replay protection.
+ * 6. Private storage delivery: Supports genuine private asset isolation outside public CDNs.
  */
 
 export interface GatedAsset {
   id: string;
-  url: string;
+  url?: string;
+  localPath?: string;
   fileName: string;
   title: string;
-  source: "static" | "contentful" | "dynamic";
+  source: "static" | "contentful" | "dynamic" | "private";
+  storageType?: "private-storage" | "cdn-brokered";
 }
+
 
 export interface ValidatedLead {
   firstName: string;
@@ -54,16 +69,23 @@ export interface DownloadTokenPayload {
 // STATIC GATED ASSET REGISTRY
 // -----------------------------------------------------------------------------
 
+// Private asset storage directory (never exposed to public CDN or web root)
+export const PRIVATE_ASSETS_DIR =
+  process.env.PRIVATE_ASSETS_DIR ||
+  path.join(process.cwd(), "private-assets");
+
 export const STATIC_GATED_ASSETS: Record<
   string,
-  { url: string; fileName: string; title: string }
+  { url: string; fileName: string; title: string; privateFile?: string }
 > = {
   "fusion-readiness-guide": {
+    privateFile: "HealthCheck.pdf",
     url: "https://dluxeqiq.com/assets/HealthCheck.pdf",
     fileName: "fusion-readiness-guide.pdf",
     title: "Fusion Readiness Health Check",
   },
   "use-case-1": {
+    privateFile: "Use_Case_1.pdf",
     url: "https://assets.ctfassets.net/pj0maraabon4/1vLmJScTXRDqiQtc6hWEt6/055031f7046bd112d8008ba84172a395/Use_Case_1__1_.pdf",
     fileName: "Use_Case_1.pdf",
     title: "AI Powered Personalised Landing Pages",
@@ -237,6 +259,23 @@ export async function resolveGatedAsset(params: {
   // 1. Direct match in static registry
   if (assetId && STATIC_GATED_ASSETS[assetId]) {
     const item = STATIC_GATED_ASSETS[assetId];
+
+    // Priority 1: Check for genuinely private local storage asset
+    if (item.privateFile) {
+      const localFilePath = path.resolve(PRIVATE_ASSETS_DIR, item.privateFile);
+      if (fs.existsSync(localFilePath)) {
+        return {
+          id: assetId,
+          url: item.url,
+          localPath: localFilePath,
+          fileName: item.fileName,
+          title: item.title,
+          source: "private",
+          storageType: "private-storage",
+        };
+      }
+    }
+
     const safeUrl = getSafePdfUrl(item.url);
     if (!safeUrl) return null;
     return {
@@ -245,6 +284,7 @@ export async function resolveGatedAsset(params: {
       fileName: item.fileName,
       title: item.title,
       source: "static",
+      storageType: "cdn-brokered",
     };
   }
 
@@ -252,6 +292,22 @@ export async function resolveGatedAsset(params: {
   if (useCase && USE_CASE_VALUE_TO_KEY[useCase]) {
     const key = USE_CASE_VALUE_TO_KEY[useCase];
     const item = STATIC_GATED_ASSETS[key];
+
+    if (item.privateFile) {
+      const localFilePath = path.resolve(PRIVATE_ASSETS_DIR, item.privateFile);
+      if (fs.existsSync(localFilePath)) {
+        return {
+          id: key,
+          url: item.url,
+          localPath: localFilePath,
+          fileName: item.fileName,
+          title: item.title,
+          source: "private",
+          storageType: "private-storage",
+        };
+      }
+    }
+
     const safeUrl = getSafePdfUrl(item.url);
     if (!safeUrl) return null;
     return {
@@ -260,11 +316,24 @@ export async function resolveGatedAsset(params: {
       fileName: item.fileName,
       title: item.title,
       source: "static",
+      storageType: "cdn-brokered",
     };
   }
 
-  // 3. Resolve dynamic Case Study via slug from Contentful
+  // 3. Resolve dynamic Case Study via slug from Contentful or Private Storage
   if (slug) {
+    const privateSlugPath = path.resolve(PRIVATE_ASSETS_DIR, `${slug}.pdf`);
+    if (fs.existsSync(privateSlugPath)) {
+      return {
+        id: slug,
+        localPath: privateSlugPath,
+        fileName: `${slug}.pdf`,
+        title: "Case Study",
+        source: "private",
+        storageType: "private-storage",
+      };
+    }
+
     try {
       const data = await fetchContentfulGraphQL<{
         caseStudyCollection?: {
@@ -333,30 +402,115 @@ export async function resolveGatedAsset(params: {
   return null;
 }
 
+/**
+ * Audits whether an asset is delivered from private access-controlled storage vs. public CDN.
+ */
+export function verifyAssetStorageSecurity(asset: GatedAsset): {
+  isPrivate: boolean;
+  deliveryMode: "private-storage" | "cdn-brokered";
+  warning?: string;
+} {
+  if (asset.localPath || asset.source === "private") {
+    return {
+      isPrivate: true,
+      deliveryMode: "private-storage",
+    };
+  }
+
+  return {
+    isPrivate: false,
+    deliveryMode: "cdn-brokered",
+    warning:
+      "Asset is delivered via server-brokered streaming from upstream CDN. For true storage confidentiality, deploy assets in private S3/GCS buckets with IAM/presigned URLs or private disk storage.",
+  };
+}
+
 // -----------------------------------------------------------------------------
 // TOKEN CREATION & VERIFICATION (HMAC-SHA256)
 // -----------------------------------------------------------------------------
 
-const TOKEN_SECRET =
-  process.env.DOWNLOAD_TOKEN_SECRET ||
-  process.env.NEXTAUTH_SECRET ||
-  "dlux-secure-gated-download-secret-key-32chars";
+/**
+ * Validates and retrieves the download token signing secret exclusively from
+ * process.env.DOWNLOAD_TOKEN_SECRET.
+ *
+ * Security requirements:
+ * 1. Must be present and non-empty.
+ * 2. Must be at least 32 characters long for strong HMAC-SHA256 security.
+ * 3. Never falls back to hardcoded strings, empty strings, NEXTAUTH_SECRET,
+ *    or client-exposed variables.
+ * 4. Fails closed (throws descriptive internal error) when missing or invalid.
+ */
+export function getDownloadTokenSecret(): string {
+  const secret = process.env.DOWNLOAD_TOKEN_SECRET;
+
+  if (!secret || typeof secret !== "string" || secret.trim().length === 0) {
+    throw new Error(
+      "CRITICAL SECURITY CONFIGURATION ERROR: DOWNLOAD_TOKEN_SECRET environment variable is missing or empty. Fail-closed: refusing to sign or verify tokens without valid secret configuration."
+    );
+  }
+
+  const trimmed = secret.trim();
+
+  if (trimmed.length < 32) {
+    throw new Error(
+      "CRITICAL SECURITY CONFIGURATION ERROR: DOWNLOAD_TOKEN_SECRET is too short (must be at least 32 characters for HMAC-SHA256)."
+    );
+  }
+
+  // Reject known sample/placeholder strings from example configurations
+  if (
+    trimmed === "your_secure_download_token_secret_minimum_32_characters" ||
+    trimmed === "dlux-secure-gated-download-secret-key-32chars"
+  ) {
+    throw new Error(
+      "CRITICAL SECURITY CONFIGURATION ERROR: DOWNLOAD_TOKEN_SECRET is set to an insecure placeholder value. Please configure a cryptographically random secret."
+    );
+  }
+
+  return trimmed;
+}
+
+/**
+ * Test helper for isolating environment-variable changes during automated tests.
+ * Directly modifies process.env.DOWNLOAD_TOKEN_SECRET to ensure getDownloadTokenSecret()
+ * exclusively reads from the environment variable.
+ */
+export function setDownloadTokenSecretForTesting(secret: string | null): void {
+  if (secret === null) {
+    delete process.env.DOWNLOAD_TOKEN_SECRET;
+  } else {
+    process.env.DOWNLOAD_TOKEN_SECRET = secret;
+  }
+}
 
 const DEFAULT_EXPIRATION_MS = 10 * 60 * 1000; // 10 minutes
 
-// Token consumption tracker (prevents replay / brute force)
-interface TokenUsage {
-  usedCount: number;
-  maxUses: number;
-  expiresAt: number;
+// Active pluggable stores for token replay prevention & distributed rate limiting
+let activeTokenStore: TokenStore = createDefaultTokenStore();
+let activeRateLimitStore: RateLimitStore = createDefaultRateLimitStore();
+
+export function setDownloadTokenStore(store: TokenStore): void {
+  activeTokenStore = store;
 }
-const tokenRegistry = new Map<string, TokenUsage>();
+
+export function getDownloadTokenStore(): TokenStore {
+  return activeTokenStore;
+}
+
+export function setRateLimitStore(store: RateLimitStore): void {
+  activeRateLimitStore = store;
+}
+
+export function getRateLimitStore(): RateLimitStore {
+  return activeRateLimitStore;
+}
 
 export function createDownloadToken(
   assetId: string,
   email: string,
   options?: { expiresInMs?: number; maxUses?: number }
 ): string {
+  const secret = getDownloadTokenSecret();
   const expiresInMs = options?.expiresInMs ?? DEFAULT_EXPIRATION_MS;
   const maxUses = options?.maxUses ?? 5;
   const now = Date.now();
@@ -372,11 +526,11 @@ export function createDownloadToken(
 
   const payloadB64 = Buffer.from(JSON.stringify(payload)).toString("base64url");
   const signature = crypto
-    .createHmac("sha256", TOKEN_SECRET)
+    .createHmac("sha256", secret)
     .update(payloadB64)
     .digest("base64url");
 
-  tokenRegistry.set(jti, {
+  activeTokenStore.set(jti, {
     usedCount: 0,
     maxUses,
     expiresAt: payload.expiresAt,
@@ -401,9 +555,22 @@ export function verifyDownloadToken(token?: string | null): {
 
   const [payloadB64, signature] = parts;
 
-  // 1. Verify HMAC Signature
+  // 1. Verify HMAC Signature using securely resolved secret
+  let secret: string;
+  try {
+    secret = getDownloadTokenSecret();
+  } catch (err: unknown) {
+    return {
+      isValid: false,
+      error:
+        err instanceof Error
+          ? err.message
+          : "Download token signing secret not configured",
+    };
+  }
+
   const expectedSig = crypto
-    .createHmac("sha256", TOKEN_SECRET)
+    .createHmac("sha256", secret)
     .update(payloadB64)
     .digest("base64url");
 
@@ -428,63 +595,70 @@ export function verifyDownloadToken(token?: string | null): {
   }
 
   // 3. Expiration check
-  if (Date.now() > payload.expiresAt) {
+  if (
+    typeof payload.expiresAt !== "number" ||
+    isNaN(payload.expiresAt) ||
+    Date.now() > payload.expiresAt
+  ) {
     return { isValid: false, error: "Download token has expired" };
   }
 
-  // 4. Replay / usage check
-  const usage = tokenRegistry.get(payload.jti);
-  if (usage && usage.usedCount >= usage.maxUses) {
-    return { isValid: false, error: "Download token usage limit exceeded" };
+  // Payload structure validation
+  if (
+    !payload.assetId ||
+    typeof payload.assetId !== "string" ||
+    !payload.jti ||
+    typeof payload.jti !== "string"
+  ) {
+    return { isValid: false, error: "Corrupted token payload" };
+  }
+
+  // 4. Replay / usage check (Fail-closed: reject if usage record is missing)
+  const usage = activeTokenStore.get(payload.jti);
+  if (!usage) {
+    return {
+      isValid: false,
+      error: "Download token usage record not found or unverified",
+    };
+  }
+
+  if (usage instanceof Promise || "then" in usage) {
+    // For synchronous verification fallback, allowed state checked in recordTokenUsage
+  } else {
+    const syncUsage = usage as TokenUsage;
+    if (syncUsage.usedCount >= syncUsage.maxUses) {
+      return { isValid: false, error: "Download token usage limit exceeded" };
+    }
   }
 
   return { isValid: true, payload };
 }
 
-export function recordTokenUsage(jti: string): boolean {
-  const usage = tokenRegistry.get(jti);
-  if (!usage) return true; // Stateless fallback if memory cycled
-  if (usage.usedCount >= usage.maxUses) return false;
-  usage.usedCount += 1;
-  return true;
+export function recordTokenUsage(jti: string): boolean | Promise<boolean> {
+  const res = activeTokenStore.recordUsage(jti);
+  if (res instanceof Promise || "then" in res) {
+    return Promise.resolve(res).then((r) => r.allowed);
+  }
+  return res.allowed;
 }
 
 // -----------------------------------------------------------------------------
 // RATE LIMITING & ABUSE PREVENTION
 // -----------------------------------------------------------------------------
 
-interface RateLimitBucket {
-  count: number;
-  resetAt: number;
-}
-const rateLimits = new Map<string, RateLimitBucket>();
-
-export function checkRateLimit(
+export async function checkRateLimit(
   key: string,
   maxRequests = 10,
   windowMs = 60_000
-): { allowed: boolean; retryAfterSeconds?: number } {
-  const now = Date.now();
-  const bucket = rateLimits.get(key);
-
-  if (!bucket || bucket.resetAt <= now) {
-    rateLimits.set(key, { count: 1, resetAt: now + windowMs });
-    return { allowed: true };
-  }
-
-  if (bucket.count >= maxRequests) {
-    const retryAfterSeconds = Math.max(1, Math.ceil((bucket.resetAt - now) / 1000));
-    return { allowed: false, retryAfterSeconds };
-  }
-
-  bucket.count += 1;
-  return { allowed: true };
+): Promise<RateLimitResult> {
+  return activeRateLimitStore.check(key, maxRequests, windowMs);
 }
 
 export function resetRateLimitsForTesting(): void {
-  rateLimits.clear();
-  tokenRegistry.clear();
+  activeRateLimitStore.clear();
+  activeTokenStore.clear();
 }
+
 
 // -----------------------------------------------------------------------------
 // UPSTREAM CRM DISPATCH (Zoho Integration & Server Verification)
@@ -568,14 +742,17 @@ export async function dispatchLeadSubmission(
       success: false,
       error: `Upstream CRM returned status ${res.status}`,
     };
-  } catch (err: any) {
+  } catch (err: unknown) {
     // If running in test or offline environment without explicit mock
     if (process.env.NODE_ENV === "test") {
       return { success: true };
     }
     return {
       success: false,
-      error: err?.message || "Failed to contact lead capture service",
+      error:
+        err instanceof Error
+          ? err.message
+          : "Failed to contact lead capture service",
     };
   }
 }

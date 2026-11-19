@@ -10,7 +10,16 @@ import { getTrainingChangeManagement } from "@/src/lib/contentful/training-chang
 export default async function TrainingChangeManagementPage() {
   // ✅ Fetch data on the server
   const page = await getTrainingChangeManagement();
-    const whyChoose =
+  if (!page) {
+    return (
+      <main className="p-10 text-center">
+        <h1 className="text-2xl font-bold">Training &amp; Change Management</h1>
+        <p>Page data not available.</p>
+      </main>
+    );
+  }
+
+  const whyChoose =
     page.Traning_changePage_WhyChooseDLUX;
  const workforce =
     page.Traning_ChangePage_BuildingaFutureReadyWorkforce;

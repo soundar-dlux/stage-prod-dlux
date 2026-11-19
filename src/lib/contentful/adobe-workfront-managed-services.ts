@@ -1,30 +1,14 @@
 import "server-only";
 import { ADOBE_WORKFRONT_QUERY } from "@/src/app/services/adobe-managed-services/queries";
 import { AdobeWorkfrontPageData } from "@/src/app/services/adobe-managed-services/types";
+import { fetchContentfulGraphQL } from "./server-client";
 
-const SPACE_ID = process.env.CONTENTFUL_SPACE_ID!;
-const ACCESS_TOKEN = process.env.CONTENTFUL_ACCESS_TOKEN!;
+export async function fetchAdobeWorkfrontManagedServices(): Promise<AdobeWorkfrontPageData | null> {
+  const data = await fetchContentfulGraphQL<any>(ADOBE_WORKFRONT_QUERY, {
+    revalidate: 60,
+  });
 
-export async function fetchAdobeWorkfrontManagedServices(): Promise<AdobeWorkfrontPageData> {
-  const res = await fetch(
-    `https://graphql.contentful.com/content/v1/spaces/${SPACE_ID}/environments/production`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${ACCESS_TOKEN}`,
-      },
-      body: JSON.stringify({ query: ADOBE_WORKFRONT_QUERY }),
-      next: { revalidate: 60 },
-    }
-  );
-
-  const { data, errors } = await res.json();
-
-  if (errors) {
-    console.error(errors);
-    throw new Error("Contentful fetch failed");
-  }
+  if (!data) return null;
 
   return {
     ourClients: [data.ourClients],

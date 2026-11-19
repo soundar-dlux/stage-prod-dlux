@@ -27,7 +27,7 @@ export default function HeroBanner() {
                     initial={{ opacity: 0, y: 35, scale: 0.98 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     transition={{ duration: 0.8, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-                    className="relative w-full max-w-[1100px] mx-auto pt-10 sm:pt-16 pb-0 flex justify-center items-end"
+                    className="relative w-full max-w-[1200px] mx-auto pt-10 sm:pt-16 pb-0 flex justify-center items-end"
                 >
                     {/* ORANGE BACKGROUND BOX */}
                     <div

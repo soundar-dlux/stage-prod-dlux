@@ -1,3 +1,4 @@
+import fs from "node:fs";
 import {
   validateLeadPayload,
   resolveGatedAsset,
@@ -6,7 +7,9 @@ import {
   verifyDownloadToken,
   recordTokenUsage,
   checkRateLimit,
+  LeadSubmissionPayload,
 } from "@/src/lib/downloads/server";
+import { getTrustedClientIp } from "@/src/lib/security/client-ip";
 
 export const dynamic = "force-dynamic";
 
@@ -15,13 +18,20 @@ export const dynamic = "force-dynamic";
  * Validates lead data, submits to CRM server-side, and issues a time-limited download token.
  */
 export async function POST(req: Request) {
-  // 1. IP Rate Limiting
-  const clientIp =
-    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    req.headers.get("x-real-ip") ||
-    "client";
+  // 1. IP Rate Limiting with trusted IP extraction and direct-bypass check
+  const clientIp = getTrustedClientIp(req);
 
-  const ipLimit = checkRateLimit(`ip:${clientIp}`, 20, 60_000);
+  if (clientIp === "untrusted-proxy-bypass") {
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: "Forbidden: Direct origin access is not permitted.",
+      }),
+      { status: 403, headers: { "Content-Type": "application/json" } },
+    );
+  }
+
+  const ipLimit = await checkRateLimit(`ip:${clientIp}`, 20, 60_000);
   if (!ipLimit.allowed) {
     return new Response(
       JSON.stringify({
@@ -34,18 +44,18 @@ export async function POST(req: Request) {
           "Content-Type": "application/json",
           "Retry-After": String(ipLimit.retryAfterSeconds || 60),
         },
-      }
+      },
     );
   }
 
   // 2. Parse JSON
-  let body: any;
+  let body: LeadSubmissionPayload;
   try {
-    body = await req.json();
+    body = (await req.json()) as LeadSubmissionPayload;
   } catch {
     return new Response(
       JSON.stringify({ success: false, error: "Invalid JSON request body" }),
-      { status: 400, headers: { "Content-Type": "application/json" } }
+      { status: 400, headers: { "Content-Type": "application/json" } },
     );
   }
 
@@ -54,12 +64,16 @@ export async function POST(req: Request) {
   if (!validation.isValid || !validation.lead) {
     return new Response(
       JSON.stringify({ success: false, error: validation.error }),
-      { status: 400, headers: { "Content-Type": "application/json" } }
+      { status: 400, headers: { "Content-Type": "application/json" } },
     );
   }
 
   // 4. Email Rate Limiting
-  const emailLimit = checkRateLimit(`email:${validation.lead.email}`, 5, 60_000);
+  const emailLimit = await checkRateLimit(
+    `email:${validation.lead.email}`,
+    5,
+    60_000,
+  );
   if (!emailLimit.allowed) {
     return new Response(
       JSON.stringify({
@@ -72,7 +86,7 @@ export async function POST(req: Request) {
           "Content-Type": "application/json",
           "Retry-After": String(emailLimit.retryAfterSeconds || 60),
         },
-      }
+      },
     );
   }
 
@@ -90,12 +104,13 @@ export async function POST(req: Request) {
         success: false,
         error: "Requested asset not found or unavailable.",
       }),
-      { status: 404, headers: { "Content-Type": "application/json" } }
+      { status: 404, headers: { "Content-Type": "application/json" } },
     );
   }
 
   // 6. Server-side CRM dispatch (verification before unlocking)
-  let formType: "case-study" | "use-case" | "fusion-health-check" = "case-study";
+  let formType: "case-study" | "use-case" | "fusion-health-check" =
+    "case-study";
   if (asset.id === "fusion-readiness-guide") {
     formType = "fusion-health-check";
   } else if (body.useCase || asset.id.startsWith("use-case-")) {
@@ -114,12 +129,27 @@ export async function POST(req: Request) {
         error:
           "Unable to verify lead submission. Please check your information and try again.",
       }),
-      { status: 502, headers: { "Content-Type": "application/json" } }
+      { status: 502, headers: { "Content-Type": "application/json" } },
     );
   }
 
-  // 7. Generate Signed Download Token
-  const downloadToken = createDownloadToken(asset.id, validation.lead.email);
+  // 7. Generate Signed Download Token (fails closed if secret missing or invalid)
+  let downloadToken: string;
+  try {
+    downloadToken = createDownloadToken(asset.id, validation.lead.email);
+  } catch (err: unknown) {
+    console.error(
+      "Failed to generate download token: authorization signing secret unavailable or invalid",
+    );
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error:
+          "Download authorization is temporarily unavailable. Please try again later.",
+      }),
+      { status: 503, headers: { "Content-Type": "application/json" } },
+    );
+  }
 
   return new Response(
     JSON.stringify({
@@ -135,7 +165,7 @@ export async function POST(req: Request) {
         "Content-Type": "application/json",
         "Cache-Control": "no-store",
       },
-    }
+    },
   );
 }
 
@@ -152,29 +182,36 @@ export async function GET(req: Request) {
       JSON.stringify({
         error: "Unauthorized: Missing download authorization token",
       }),
-      { status: 401, headers: { "Content-Type": "application/json" } }
+      { status: 401, headers: { "Content-Type": "application/json" } },
     );
   }
 
   // 1. Verify Token
   const verification = verifyDownloadToken(token);
   if (!verification.isValid || !verification.payload) {
+    const isConfigError =
+      verification.error?.toLowerCase().includes("secret") ||
+      verification.error?.toLowerCase().includes("configuration");
+    const clientError = isConfigError
+      ? "Unauthorized: Invalid or unverifiable download authorization token"
+      : `Unauthorized: ${verification.error || "Invalid token"}`;
+
     return new Response(
       JSON.stringify({
-        error: `Unauthorized: ${verification.error || "Invalid token"}`,
+        error: clientError,
       }),
-      { status: 401, headers: { "Content-Type": "application/json" } }
+      { status: 401, headers: { "Content-Type": "application/json" } },
     );
   }
 
-  // 2. Enforce Token Usage / Replay
-  const allowed = recordTokenUsage(verification.payload.jti);
+  // 2. Enforce Token Usage / Replay (Fail-closed)
+  const allowed = await recordTokenUsage(verification.payload.jti);
   if (!allowed) {
     return new Response(
       JSON.stringify({
         error: "Forbidden: Download token usage limit exceeded",
       }),
-      { status: 403, headers: { "Content-Type": "application/json" } }
+      { status: 403, headers: { "Content-Type": "application/json" } },
     );
   }
 
@@ -187,23 +224,59 @@ export async function GET(req: Request) {
   if (!asset) {
     return new Response(
       JSON.stringify({ error: "Asset not found or no longer available" }),
-      { status: 404, headers: { "Content-Type": "application/json" } }
+      { status: 404, headers: { "Content-Type": "application/json" } },
     );
   }
 
-  // 4. Private Delivery
+  // 4. Private Delivery (Never redirect or leak upstream CDN/storage URLs)
+  const safeFileName = asset.fileName.replace(/[^a-zA-Z0-9._-]/g, "_");
+
+  // Mode A: Direct private storage delivery (Zero CDN exposure, air-gapped from public web)
+  if (asset.localPath) {
+    try {
+      const fileBuffer = await fs.promises.readFile(asset.localPath);
+      return new Response(fileBuffer, {
+        status: 200,
+        headers: {
+          "Content-Type": "application/pdf",
+          "Content-Disposition": `attachment; filename="${safeFileName}"`,
+          "Cache-Control": "private, no-store, max-age=0, must-revalidate",
+          "X-Content-Type-Options": "nosniff",
+        },
+      });
+    } catch {
+      return new Response(
+        JSON.stringify({
+          error: "Protected asset could not be read from private storage",
+        }),
+        { status: 500, headers: { "Content-Type": "application/json" } },
+      );
+    }
+  }
+
+  // Mode B: Server-brokered upstream streaming
+  if (!asset.url) {
+    return new Response(JSON.stringify({ error: "Asset source unavailable" }), {
+      status: 404,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
   try {
     const upstreamRes = await fetch(asset.url, {
       signal: AbortSignal.timeout(10000),
     });
 
     if (!upstreamRes.ok) {
-      // Fallback: safe redirect
-      return Response.redirect(asset.url, 307);
+      return new Response(
+        JSON.stringify({
+          error: "Upstream asset is temporarily unavailable",
+        }),
+        { status: 502, headers: { "Content-Type": "application/json" } },
+      );
     }
 
     const fileBuffer = await upstreamRes.arrayBuffer();
-    const safeFileName = asset.fileName.replace(/[^a-zA-Z0-9._-]/g, "_");
 
     return new Response(fileBuffer, {
       status: 200,
@@ -215,7 +288,12 @@ export async function GET(req: Request) {
       },
     });
   } catch {
-    // If upstream streaming fails, redirect to safe canonical URL
-    return Response.redirect(asset.url, 307);
+    return new Response(
+      JSON.stringify({
+        error:
+          "Failed to securely retrieve download asset from upstream storage",
+      }),
+      { status: 502, headers: { "Content-Type": "application/json" } },
+    );
   }
 }

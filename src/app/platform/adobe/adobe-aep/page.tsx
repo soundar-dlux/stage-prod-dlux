@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import ImageLRComponenets from "@/src/components/ui/WB-Components/imageLRComponenets";
+import ImageLRComponenets, { ImageLRComponents } from "@/src/components/ui/WB-Components/imageLRComponenets";
 import HeroBanner from "@/src/components/sections/platform/adobe/adobe-aep/Hero";
 import CapabilitiesSection from "@/src/components/sections/platform/adobe/adobe-aep/Capabilities";
 import SolutionsSection from "@/src/components/sections/platform/adobe/adobe-aep/Solutions";
@@ -43,16 +43,16 @@ export default function AdobeAnalytics() {
             <HeroBanner />
 
             {/* Section 1: Image Left Condition with Dual-Color Title & Custom Button */}
-            <ImageLRComponenets
+            <ImageLRComponents
                 imagePosition="left"
                 title="Why AEP"
                 highlightText="AEP"
                 highlightColor="text-brand-primary"
                 description={[
                     "Customer data lives everywhere: websites, mobile apps, CRM systems, commerce platforms, and marketing tools. Left disconnected, that data creates blind spots and inconsistent experiences. Adobe Experience Platform (AEP) solves this by unifying customer data into one real-time system, giving teams the clarity to make faster decisions and deliver personalized experiences at every touchpoint.",
-                    "At DLUX Tech, we help businesses put that platform to work. Our experienced adobe experts have exposures in different areas and can help you build a system that scales."
+                    "At DLUX Tech, we help businesses put that platform to work. Our experienced Adobe experts have experience in different areas and can help you build a system that scales.",
                 ]}
-                imageSrc="https://images.ctfassets.net/pj0maraabon4/105QVVrIOcFvcEdkO8zEvM/c54fed70b11573a23519a847c1e2d61a/Mask_group.png"
+                imageSrc="https://images.ctfassets.net/pj0maraabon4/105QVVrIOcFvcEdkO8zEvM/ea38f9b01554660e8ec384e79d9236d7/Why_AEP-Image.svg"
                 imageAlt="Adobe Analytics Dashboard Showcase"
                 primaryCta={{
                     text: "Talk to our Adobe Experts",
@@ -60,7 +60,6 @@ export default function AdobeAnalytics() {
                 }}
                 bgVariant="white"
             />
-
             {/* AEP Capabilities Section */}
             <CapabilitiesSection />
 
@@ -82,4 +81,3 @@ export default function AdobeAnalytics() {
         </main>
     );
 }
-        

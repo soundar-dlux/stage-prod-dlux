@@ -3,13 +3,9 @@ import assert from "node:assert/strict";
 import {
   parseYouTubeVideo,
   parseLinkedInVideo,
-  getVideoEmbedDetails,
-  getSafeVideoEmbedUrl,
-  getSafeVideoWatchUrl,
   getSafeDirectVideoUrl,
   resolveSafeMedia,
   getSafePdfUrl,
-  isSafeVideoUrl,
   isSafePdfUrl,
 } from "../../src/lib/security/content-urls";
 

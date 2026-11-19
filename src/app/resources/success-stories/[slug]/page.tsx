@@ -17,9 +17,11 @@ export default async function SuccessStoryDetail({ params }: Props) {
     .filter((item) => item.slug !== slug)
     .slice(0, 3);
 
+  const { caseStudyPdf, ...safeStory } = story;
+
   return (
     <StoryDetailClient
-      story={story}
+      story={safeStory}
       relatedStories={relatedStories}
     />
   );

@@ -11,7 +11,12 @@ export default async function ContentManagementDAMPage() {
   const data = await getContentManagementDAM();
 
   if (!data?.hero || !data?.contentAndDam) {
-    throw new Error("Content Management DAM data missing");
+    return (
+      <main className="p-10 text-center">
+        <h1 className="text-2xl font-bold">Content Management &amp; DAM</h1>
+        <p>Page data not available.</p>
+      </main>
+    );
   }
 
   return (

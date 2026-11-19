@@ -1,8 +1,14 @@
+
 "use client";
 
 import React, { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+
 import ImageLRComponents from "@/src/components/ui/WB-Components/imageLRComponenets";
+
+/* =========================================================
+   TYPES
+========================================================= */
 
 export interface TabItem {
   id: string;
@@ -13,6 +19,10 @@ export interface TabItem {
   highlights?: string[];
   badge?: string;
 }
+
+/* =========================================================
+   TABS DATA
+========================================================= */
 
 const tabsData: TabItem[] = [
   {
@@ -53,30 +63,47 @@ const tabsData: TabItem[] = [
   },
 ];
 
+/* =========================================================
+   MAIN COMPONENT
+========================================================= */
+
 export function WhyChooseDluxSection() {
   const [activeTab, setActiveTab] = useState<string>("partner");
-  const tabRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
 
-  const currentTab = tabsData.find((t) => t.id === activeTab) || tabsData[0];
+  const tabRefs = useRef<{
+    [key: string]: HTMLButtonElement | null;
+  }>({});
+
+  const currentTab =
+    tabsData.find((tab) => tab.id === activeTab) || tabsData[0];
+
+  /* =====================================================
+     TAB CLICK HANDLER
+  ===================================================== */
 
   const handleTabClick = (id: string) => {
     setActiveTab(id);
-    if (tabRefs.current[id]) {
-      tabRefs.current[id]?.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-        inline: "center",
-      });
-    }
+
+    tabRefs.current[id]?.scrollIntoView({
+      behavior: "smooth",
+      block: "nearest",
+      inline: "center",
+    });
   };
+
+  /* =====================================================
+     JSX
+  ===================================================== */
 
   return (
     <section className="relative w-full bg-white py-[40px] overflow-hidden font-sans">
 
       <div className="relative max-w-full mx-auto px-4 sm:px-6 lg:px-8">
-        {/* =========================================================
+
+        {/* =================================================
             HEADER AREA
-           ========================================================= */}
+        ================================================= */}
+
         <motion.div
           initial={{ opacity: 0, y: 25 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -85,25 +112,43 @@ export function WhyChooseDluxSection() {
           className="text-center max-w-4xl mx-auto mb-10 sm:mb-12"
         >
           <h2 className="text-3xl sm:text-4xl lg:text-[46px] font-extrabold tracking-tight text-black lg:leading-tight mb-5">
-            Why <span className="text-[#FF4F00]">Clients choose DLUX</span> as their
+            Why{" "}
+            <span className="text-[#FF4F00]">
+              Clients choose DLUX
+            </span>{" "}
+            as their
             <br className="hidden sm:inline" /> Adobe Partner
           </h2>
 
           <p className="text-gray-500 text-sm sm:text-[15px] leading-relaxed font-normal max-w-3xl mx-auto">
-            Adobe Experience Platform is the foundation your customer experience strategy is built on. Get the architecture, identity, and governance right from the start, and it scales with you. Get it wrong, and it's another disconnected system that needs to be rebuilt down the line. DLUX Tech turns
-            fragmented customer data into a governed foundation for personalisation, analytics, and activation, across
-            Real-Time CDP, Customer Journey Analytics, Journey Optimizer, and GenStudio.
+            Adobe Experience Platform is the foundation your customer
+            experience strategy is built on. Get the architecture,
+            identity, and governance right from the start, and it scales
+            with you. Get it wrong, and it's another disconnected system
+            that needs to be rebuilt down the line. DLUX Tech turns
+            fragmented customer data into a governed foundation for
+            personalisation, analytics, and activation, across Real-Time
+            CDP, Customer Journey Analytics, Journey Optimizer, and
+            GenStudio.
           </p>
         </motion.div>
 
-        {/* =========================================================
-            FOLDER TABBED NAVIGATION BAR
-           ========================================================= */}
-        <div className="w-full flex flex-col items-center mb-12 sm:mb-16">
+        {/* =================================================
+            ZIGZAG TAB NAVIGATION
+        ================================================= */}
+
+        <div className="w-full flex flex-col items-center">
+
           <div className="w-full flex items-center justify-start sm:justify-center overflow-x-auto scrollbar-hide px-2">
+
             <div className="flex items-center min-w-max">
+
               {tabsData.map((tab, index) => {
                 const isActive = activeTab === tab.id;
+
+                // Even tabs: Top line
+                // Odd tabs: Bottom line
+                const isTopLine = index % 2 === 0;
 
                 return (
                   <button
@@ -112,6 +157,7 @@ export function WhyChooseDluxSection() {
                       tabRefs.current[tab.id] = el;
                     }}
                     onClick={() => handleTabClick(tab.id)}
+                    aria-pressed={isActive}
                     className={`
                       relative
                       w-[329.5px]
@@ -119,86 +165,137 @@ export function WhyChooseDluxSection() {
                       flex items-center justify-center
                       bg-white
                       gap-[10px]
-                      pt-[13px]
-                      pr-[48px]
-                      pb-[12px]
-                      pl-[48px]
+                      px-6
                       font-bold text-sm sm:text-base
-                      transition-all duration-200
+                      transition-colors duration-300
                       cursor-pointer select-none
-
                       border border-gray-200
+                      overflow-hidden
 
-                      ${index % 2 === 0 ? "border-t-0" : "border-b-0"}
+                      ${isTopLine ? "border-t-0" : "border-b-0"}
 
                       ${index > 0 ? "-ml-[1px]" : ""}
 
                       ${isActive
-                        ? `
-                            bg-white
-                            text-[#FF4F00]
-                            border-gray-300
-                            z-10
-                          `
-                        : `
-                            bg-gray-50/70
-                            text-gray-700
-                            hover:text-[#FF4F00]
-                            hover:bg-white
-                          `
+                        ? "bg-white text-[#FF4F00] border-gray-300 z-10"
+                        : "bg-gray-50/70 text-gray-700 hover:text-[#FF4F00] hover:bg-white"
                       }
                     `}
                   >
+
+                    {/* =================================
+                        ACTIVE ZIGZAG LINE
+                    ================================= */}
+
                     {isActive && (
-                      <span className="absolute top-0 left-0 right-0 h-[3px] bg-[#FF4F00]" />
+                      <motion.span
+                        layoutId="zigzag-active-line"
+                        initial={false}
+                        transition={{
+                          type: "spring",
+                          stiffness: 450,
+                          damping: 38,
+                        }}
+                        className={`
+                          absolute
+                          left-0
+                          right-0
+                          h-[3px]
+                          bg-[#FF4F00]
+                          ${isTopLine
+                            ? "top-0"
+                            : "bottom-0"
+                          }
+                        `}
+                      />
                     )}
 
-                    {tab.label}
+                    {/* TAB LABEL */}
+
+                    <span className="relative z-10">
+                      {tab.label}
+                    </span>
+
                   </button>
                 );
               })}
+
             </div>
+
           </div>
+
         </div>
 
-        {/* =========================================================
-            TAB CONTENT PANEL (using ImageLRComponents with Simple White BG)
-           ========================================================= */}
+        {/* =================================================
+            TAB CONTENT
+        ================================================= */}
+
         <AnimatePresence mode="wait">
+
           <motion.div
             key={activeTab}
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -15 }}
-            transition={{ duration: 0.35, ease: "easeOut" }}
-            className="w-full max-w-6xl mx-auto bg-white"
+            initial={{
+              opacity: 0,
+              y: 15,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
+            exit={{
+              opacity: 0,
+              y: -15,
+            }}
+            transition={{
+              duration: 0.35,
+              ease: "easeOut",
+            }}
+            className="w-full mx-auto bg-white"
           >
+
             <ImageLRComponents
               title={
                 <span
                   style={{
-                    background: "linear-gradient(90deg, #FE780C 0%, #FE3908 100%)",
+                    background:
+                      "linear-gradient(90deg, #FE780C 0%, #FE3908 100%)",
                     WebkitBackgroundClip: "text",
                     WebkitTextFillColor: "transparent",
                   }}
-                  className="font-extrabold inline-block"
+                  className="font-extrabold inline-block p-[5px]"
                 >
                   {currentTab.heading}
                 </span>
               }
+
               badge={currentTab.badge}
+
               description={currentTab.description}
+
               features={currentTab.highlights}
+
               bgVariant="white"
+
               imagePosition="left"
+
               imageSrc={currentTab.imageSrc}
+
               imageAlt={currentTab.heading}
+
               disableImageHover={true}
+
+              showContentTopLine={false}
+              showSectionBottomLine={false}
+
               className="py-0 px-0 bg-white [&_img]:!transform-none [&_img]:!scale-100"
             />
+
           </motion.div>
+
         </AnimatePresence>
+
       </div>
+
     </section>
   );
 }

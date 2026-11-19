@@ -15,13 +15,13 @@ export default function ClientsMarquee({ clients }: Props) {
   const row1Ref = useRef<HTMLDivElement>(null);
   const row2Ref = useRef<HTMLDivElement>(null);
 
-  const logos = clients.dluxImageCollection.items.slice(0, 10);
+  const logos = clients?.dluxImageCollection?.items?.slice(0, 10) ?? [];
   const row1 = logos.slice(0, 5);
   const row2 = logos.slice(5, 10);
 
   /* ---------- GSAP MARQUEE ---------- */
   useEffect(() => {
-    if (!row1Ref.current || !row2Ref.current) return;
+    if (!row1Ref.current || !row2Ref.current || logos.length === 0) return;
 
     const row1El = row1Ref.current;
     const row2El = row2Ref.current;

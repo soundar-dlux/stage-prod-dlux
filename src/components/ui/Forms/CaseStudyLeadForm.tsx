@@ -41,7 +41,6 @@ export default function CaseStudyLeadForm({
           phone,
           slug,
           assetId,
-          pdfUrl,
         }),
       });
 

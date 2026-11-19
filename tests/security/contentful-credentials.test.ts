@@ -2,6 +2,7 @@ import { describe, it, afterEach } from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
+import crypto from "node:crypto";
 import {
   getContentfulConfig,
   fetchContentfulGraphQL,
@@ -9,8 +10,13 @@ import {
 import { fetchBlogResourcesData } from "../../src/lib/contentful/blog-resources";
 import { fetchAdobeCommercePageData } from "../../src/lib/contentful/adobe-commerce";
 import { fetchCareersGallery } from "../../src/lib/contentful/careers-gallery";
+import { fetchClients } from "../../src/lib/contentful/ClientsLogo";
+import { fetchOurTeamData } from "../../src/lib/contentful/our-team";
 
-const COMPROMISED_TOKEN = "6t-wgSsZnD80bBuG3_VNcGKE0lF-LAE7EPa5NE286HU";
+// One-way SHA-256 hash digest of historical revoked token.
+// Storing only the cryptographic hash prevents keeping plain secret credentials in source files.
+const HISTORICAL_REVOKED_TOKEN_HASH =
+  "1f257757c8bb30d647bc1e066061514724870b9704dc539f834618b10c5437a6";
 
 const CLIENT_COMPONENT_PATHS = [
   "src/components/sections/resources/blogs/BlogsList.tsx",
@@ -35,11 +41,29 @@ describe("S02 Security - Browser-Exposed Contentful Credentials Verification", (
         assert.ok(fs.existsSync(fullPath), `File must exist: ${relativePath}`);
 
         const fileContent = fs.readFileSync(fullPath, "utf-8");
+
+        // Verify no token in file matches the historical revoked credential hash
+        const potentialTokens =
+          fileContent.match(/[A-Za-z0-9_-]{32,64}/g) || [];
+        for (const token of potentialTokens) {
+          const hash = crypto
+            .createHash("sha256")
+            .update(token)
+            .digest("hex");
+          assert.notStrictEqual(
+            hash,
+            HISTORICAL_REVOKED_TOKEN_HASH,
+            `Security violation: ${relativePath} contains historical revoked Contentful credential!`
+          );
+        }
+
+        // Verify no CFPAT or Contentful environment tokens are exposed
         assert.strictEqual(
-          fileContent.includes(COMPROMISED_TOKEN),
+          /CFPAT-[a-zA-Z0-9_-]{40,}/.test(fileContent),
           false,
-          `Security violation: ${relativePath} still contains literal Contentful bearer token!`
+          `Security violation: ${relativePath} contains Contentful Personal Access Token!`
         );
+
         assert.strictEqual(
           fileContent.includes("graphql.contentful.com"),
           false,
@@ -70,6 +94,18 @@ describe("S02 Security - Browser-Exposed Contentful Credentials Verification", (
       assert.strictEqual(result, null);
     });
 
+    it("recognizes placeholder access tokens as unconfigured", async () => {
+      process.env.CONTENTFUL_SPACE_ID = "pj0maraabon4";
+      process.env.CONTENTFUL_ACCESS_TOKEN = "rotated_contentful_access_token_placeholder";
+
+      const config = getContentfulConfig();
+      assert.strictEqual(config.isConfigured, false);
+      assert.strictEqual(config.endpoint, "");
+
+      const result = await fetchContentfulGraphQL(`{ test }`);
+      assert.strictEqual(result, null);
+    });
+
     it("handles upstream HTTP 500 error gracefully without crashing", async () => {
       process.env.CONTENTFUL_SPACE_ID = "test-space";
       process.env.CONTENTFUL_ACCESS_TOKEN = "test-token";
@@ -79,6 +115,22 @@ describe("S02 Security - Browser-Exposed Contentful Credentials Verification", (
 
       const result = await fetchContentfulGraphQL(`{ test }`);
       assert.strictEqual(result, null);
+    });
+
+    it("returns empty team data when Contentful rejects the request", async () => {
+      process.env.CONTENTFUL_SPACE_ID = "test-space";
+      process.env.CONTENTFUL_ACCESS_TOKEN = "test-token";
+
+      globalThis.fetch = async () =>
+        new Response("Unauthorized", { status: 401 });
+
+      const result = await fetchOurTeamData();
+      assert.deepStrictEqual(result, {
+        primaryBanner: null,
+        secondaryBanner: null,
+        heroBanner: null,
+        lifeAtDlux: null,
+      });
     });
 
     it("handles upstream network connection failure gracefully", async () => {
@@ -263,6 +315,35 @@ describe("S02 Security - Browser-Exposed Contentful Credentials Verification", (
 
       const urls = await fetchCareersGallery();
       assert.deepStrictEqual(urls, ["https://gallery1.jpg", "https://gallery2.jpg"]);
+    });
+
+    it("fetchClients returns properly mapped clients data", async () => {
+      process.env.CONTENTFUL_SPACE_ID = "test-space";
+      process.env.CONTENTFUL_ACCESS_TOKEN = "test-token";
+
+      globalThis.fetch = async () =>
+        new Response(
+          JSON.stringify({
+            data: {
+              ourClients: {
+                dluxHeading: "Trusted by Leaders",
+                dluxPara: "Leading enterprises rely on DLUX",
+                dluxImageCollection: {
+                  items: [{ url: "https://images.ctfassets.net/client1.png" }],
+                },
+              },
+            },
+          }),
+          { status: 200, headers: { "Content-Type": "application/json" } }
+        );
+
+      const clients = await fetchClients();
+      assert.strictEqual(clients?.dluxHeading, "Trusted by Leaders");
+      assert.strictEqual(clients?.dluxImageCollection.items.length, 1);
+      assert.strictEqual(
+        clients?.dluxImageCollection.items[0].url,
+        "https://images.ctfassets.net/client1.png"
+      );
     });
   });
 });

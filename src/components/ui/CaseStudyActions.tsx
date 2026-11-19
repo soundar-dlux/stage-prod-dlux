@@ -83,7 +83,6 @@ export default function CaseStudyActions({ slug, pdfUrl }: Props) {
       {/* REUSED GATED FORM */}
       <CaseStudyLeadForm
         slug={slug}
-        pdfUrl={pdfUrl}
         open={open}
         setOpen={setOpen}
       />

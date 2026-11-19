@@ -13,6 +13,9 @@ const openSans = Open_Sans({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "https://www.dluxtech.com"
+  ),
   title:
     "DLUX Tech | Agentic AI, Martech Consulting | Adobe & Salesforce Experts",
 

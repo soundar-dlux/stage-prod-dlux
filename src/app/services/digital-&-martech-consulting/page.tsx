@@ -15,10 +15,19 @@ export const metadata = {
 
 export default async function DigitalMartechConsultingPage() {
   const data = await fetchDigitalMartechPage();
-const processImages =
-  data.DigitalPage_BusinessProcessOptimizationServices
-    .dluxServiceImageManyCollection?.items ?? [];
-    
+  if (!data) {
+    return (
+      <main className="p-10 text-center">
+        <h1 className="text-2xl font-bold">Digital &amp; MarTech Consulting</h1>
+        <p>Page data not available.</p>
+      </main>
+    );
+  }
+
+  const processImages =
+    data.DigitalPage_BusinessProcessOptimizationServices
+      .dluxServiceImageManyCollection?.items ?? [];
+
   return (
     <>
       <HeroSection

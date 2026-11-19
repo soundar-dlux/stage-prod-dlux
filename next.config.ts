@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
 
   images: {
     formats: ["image/avif", "image/webp"],
+    qualities: [70, 75, 80, 85],
 
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },
@@ -12,6 +13,7 @@ const nextConfig: NextConfig = {
       { protocol: "http", hostname: "images.ctfassets.net" },
       { protocol: "https", hostname: "*.ctfassets.net" },
       { protocol: "http", hostname: "*.ctfassets.net" },
+      { protocol: "https", hostname: "videos.ctfassets.net" },
       { protocol: "https", hostname: "**.dluxeqiq.com" },
       { protocol: "https", hostname: "via.placeholder.com" },
       { protocol: "https", hostname: "downloads.ctfassets.net" },

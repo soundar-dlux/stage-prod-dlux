@@ -3,7 +3,11 @@
 import React from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Image as ImageIcon } from "lucide-react";
+import HorizontalLine from "@/src/components/WB-Component/Line/HorizontalLine";
+
+/* =========================================================
+   TYPES
+========================================================= */
 
 export interface StepItem {
   number: string;
@@ -12,71 +16,95 @@ export interface StepItem {
 }
 
 export interface BringItToLifeProps {
-  /** Main section title */
   title?: React.ReactNode;
-  /** Highlight text inside title */
   highlightText?: string;
-  /** Highlight text color class */
   highlightColor?: string;
-  /** List of 4 implementation steps */
   steps?: StepItem[];
-  /** Image URL path (leave empty for empty image space) */
+
   imageSrc?: string;
-  /** Image Alt text */
   imageAlt?: string;
-  /** Custom image node override */
   customImage?: React.ReactNode;
-  /** Background color variant */
+
+  showTopLine?: boolean;
   bgVariant?: "white" | "light" | "transparent";
-  /** Custom outer container class names */
   className?: string;
 }
+
+/* =========================================================
+   DEFAULT STEPS
+========================================================= */
 
 const defaultSteps: StepItem[] = [
   {
     number: "01",
     title: "Discover",
     description:
-      "We start by understanding your business goals, customer journeys, existing data sources, and current technology environment, so the roadmap is grounded in where you actually are today, not a generic starting point. ",
+      "We start by understanding your business goals, customer journeys, existing data sources, and current technology environment, so the roadmap is grounded in where you actually are today, not a generic starting point.",
   },
   {
     number: "02",
     title: "Design",
     description:
-      "We define the data architecture, identity strategy, and governance model, along with a phased implementation roadmap, so every later decision has a solid foundation to build on. ",
+      "We define the data architecture, identity strategy, and governance model, along with a phased implementation roadmap, so every later decision has a solid foundation to build on.",
   },
   {
     number: "03",
     title: "Deliver",
     description:
-      "We implement the platform: integrations, unified customer profiles, audiences, and activation, tailored to whichever Adobe Experience Cloud applications are in scope for your business. ",
+      "We implement the platform: integrations, unified customer profiles, audiences, and activation, tailored to whichever Adobe Experience Cloud applications are in scope for your business.",
   },
   {
     number: "04",
     title: "Drive Value",
     description:
-      "Launch isn't the finish line. We support adoption, monitor performance, and continue optimising the platform so it keeps delivering value as your business evolves. ",
+      "Launch isn't the finish line. We support adoption, monitor performance, and continue optimising the platform so it keeps delivering value as your business evolves.",
   },
 ];
+
+/* =========================================================
+   MAIN COMPONENT
+========================================================= */
 
 export function BringItToLifeSection({
   title = (
     <>
-      How we <span className="text-[#FF4F00]">bring it to life</span>
+      How we{" "}
+      <span className="text-[#FF500D]">
+        bring it to life
+      </span>
     </>
   ),
+
+  highlightText,
+  highlightColor = "text-[#FF500D]",
+
   steps = defaultSteps,
+
   imageSrc = "https://images.ctfassets.net/pj0maraabon4/4RcVS0TeO62qAkGh2CXKp0/99c920dedfc777d9ea160639f9838e0d/How_we_bring_it_to_life.png",
-  imageAlt = "How we bring it to life",
+
+  imageAlt = "How we bring it to life - 4 stage implementation approach: Discover, Design, Deliver, Drive Value",
+
   customImage,
+
+  showTopLine = true,
+
   bgVariant = "white",
   className = "",
 }: BringItToLifeProps) {
+
+  /* =====================================================
+     BACKGROUND
+  ===================================================== */
+
   const bgStyles = {
     white: "bg-white text-black",
     light: "bg-[#FFF8F5] text-black",
     transparent: "bg-transparent text-black",
   };
+
+  /* =====================================================
+     IMAGE URL
+  ===================================================== */
 
   const safeImageSrc = imageSrc?.startsWith("http://")
     ? imageSrc.replace("http://", "https://")
@@ -84,91 +112,173 @@ export function BringItToLifeSection({
       ? `https:${imageSrc}`
       : imageSrc;
 
+  /* =====================================================
+     ANIMATION
+  ===================================================== */
+
+  const leftVariants = {
+    hidden: {
+      opacity: 0,
+      x: -25,
+    },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: {
+        duration: 0.6,
+        ease: [0.22, 1, 0.36, 1] as const,
+      },
+    },
+  };
+
+  const rightVariants = {
+    hidden: {
+      opacity: 0,
+      x: 25,
+    },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: {
+        duration: 0.65,
+        ease: [0.22, 1, 0.36, 1] as const,
+      },
+    },
+  };
+
+  const stepVariants = {
+    hidden: {
+      opacity: 0,
+      y: 14,
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.4,
+      },
+    },
+  };
+
+  /* =====================================================
+     RENDER TITLE
+  ===================================================== */
+
+  const renderTitle = () => {
+    if (highlightText && typeof title === "string" && title.includes(highlightText)) {
+      const parts = title.split(highlightText);
+      return (
+        <>
+          {parts[0]}
+          <span className={highlightColor}>{highlightText}</span>
+          {parts.slice(1).join(highlightText)}
+        </>
+      );
+    }
+    return title;
+  };
+
+  /* =====================================================
+     JSX
+  ===================================================== */
+
   return (
     <section
-      className={`w-full py-[40px] px-4 sm:px-6 lg:px-8 font-sans ${bgStyles[bgVariant]} ${className}`}
+      className={`relative w-full overflow-hidden py-10 sm:py-14 lg:py-16 px-6 sm:px-8 lg:px-12 font-sans ${bgStyles[bgVariant]} ${className}`}
     >
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 xl:gap-16 items-center">
-          {/* =================================================== */}
-          {/* 🔹 LEFT COLUMN: Title & Step Items                 */}
-          {/* =================================================== */}
+      <div className="mx-auto max-w-[1240px]">
+
+        {/* =============================================
+            MAIN GRID: 2 Equal Columns
+        ============================================= */}
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 xl:gap-16 items-start">
+          {/* =============================================
+              LEFT COLUMN: Title & Steps
+          ============================================= */}
+
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="col-span-1 lg:col-span-7 flex flex-col justify-center"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.15 }}
+            variants={leftVariants}
+            className="col-span-1 lg:col-span-6 w-full flex flex-col justify-between"
           >
-            {/* Section Title */}
-            <h2 className="text-3xl sm:text-4xl lg:text-[44px] font-extrabold tracking-tight text-black lg:leading-tight mb-8 sm:mb-10">
-              {title}
+            <HorizontalLine />
+
+            {/* Section Heading */}
+            <h2 className="text-3xl sm:text-4xl lg:text-[42px] font-extrabold tracking-tight text-black leading-tight m-[revert]">
+              {renderTitle()}
             </h2>
 
             {/* Steps List */}
             <div className="w-full flex flex-col">
               {steps.map((step, idx) => (
                 <motion.div
-                  key={idx}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.4, delay: idx * 0.1 }}
-                  className="w-full border-t border-gray-200 py-6 sm:py-7 flex items-start gap-4 sm:gap-6"
+                  key={step.number || idx}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, amount: 0.2 }}
+                  variants={stepVariants}
+                  transition={{
+                    delay: idx * 0.08,
+                  }}
+                  className="w-full grid grid-cols-[36px_1fr] sm:grid-cols-[44px_1fr] items-start gap-3 sm:gap-4 py-5 sm:py-6 border-t border-[#EDEDED]"
                 >
                   {/* Step Number */}
-                  <span className="text-gray-900 font-bold text-sm sm:text-base w-8 sm:w-10 shrink-0 pt-0.5">
+                  <span className="text-[13px] sm:text-[14px] font-bold text-[#1B1B1B] pt-0.5">
                     {step.number}
                   </span>
 
-                  {/* Step Title & Description */}
-                  <div className="flex-1 text-sm sm:text-[15px] leading-relaxed text-gray-600 font-normal">
-                    <strong className="text-[#FF4F00] font-bold mr-1.5">
+                  {/* Step Content */}
+                  <p className="min-w-0 text-[13px] sm:text-[14px] leading-[1.65] text-[#555555] font-normal">
+                    <strong className="font-bold text-[#FF500D] mr-1.5">
                       {step.title}:
                     </strong>
-                    <span>{step.description}</span>
-                  </div>
+                    <span>
+                      {step.description}
+                    </span>
+                  </p>
                 </motion.div>
               ))}
             </div>
           </motion.div>
 
-          {/* =================================================== */}
-          {/* 🔹 RIGHT COLUMN: Image Area (Empty Placeholder)    */}
-          {/* =================================================== */}
+          {/* =============================================
+              RIGHT COLUMN: Photo Card
+          ============================================= */}
+
           <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.65 }}
-            className="col-span-1 lg:col-span-5 w-full flex justify-center"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.15 }}
+            variants={rightVariants}
+            className="col-span-1 lg:col-span-6 w-full flex justify-center lg:justify-end items-start"
           >
-            <div className="relative w-full aspect-[4/5] sm:aspect-[3/4] max-w-[540px] rounded-[28px] sm:rounded-[32px] overflow-hidden shadow-lg border border-gray-200/80 bg-gray-50 flex items-center justify-center">
+            <div className="relative w-full max-w-[540px] aspect-[5/6] rounded-[28px] sm:rounded-[32px] overflow-hidden shadow-[0_4px_24px_rgba(0,0,0,0.06)] bg-[#F8F8F8]">
               {customImage ? (
                 customImage
-              ) : safeImageSrc ? (
+              ) : (
                 <Image
                   src={safeImageSrc}
                   alt={imageAlt}
                   fill
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="object-cover object-center rounded-[28px] sm:rounded-[32px]"
+                  sizes="(max-width: 1024px) 100vw, 540px"
+                  className="object-cover object-center"
+                  priority
                 />
-              ) : (
-                /* Empty Image Space Placeholder Frame */
-                <div className="w-full h-full flex flex-col items-center justify-center p-8 bg-gradient-to-br from-gray-50 via-orange-50/20 to-gray-100 rounded-[28px] sm:rounded-[32px] border-2 border-dashed border-gray-300/70 text-gray-400 group hover:border-[#FF4F00]/50 transition-colors duration-300">
-                  <div className="w-16 h-16 rounded-full bg-white shadow-sm flex items-center justify-center mb-4 text-[#FF4F00] opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300">
-                    <ImageIcon className="w-8 h-8 stroke-[1.75]" />
-                  </div>
-                  <span className="text-sm font-medium text-gray-400 text-center">
-                    Image Space (Empty)
-                  </span>
-                </div>
               )}
             </div>
           </motion.div>
+
         </div>
       </div>
+
+      {/* Decorative soft orange ambient glow in bottom right corner (as seen in screenshot) */}
+      <div
+        className="pointer-events-none absolute -bottom-16 -right-16 h-72 w-72 rounded-full bg-gradient-to-tl from-[#FF500D]/15 via-[#FF780C]/8 to-transparent blur-3xl"
+        aria-hidden="true"
+      />
     </section>
   );
 }
