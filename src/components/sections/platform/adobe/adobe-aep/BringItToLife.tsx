@@ -4,6 +4,7 @@ import React from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import HorizontalLine from "@/src/components/WB-Component/Line/HorizontalLine";
+import OrangeGradientCircle from "@/src/components/WB-Component/Decorative/OrangeGradientCircle";
 
 /* =========================================================
    TYPES
@@ -272,13 +273,9 @@ export function BringItToLifeSection({
           </motion.div>
 
         </div>
-      </div>
+        <HorizontalLine className="relative top-[60px]" />
 
-      {/* Decorative soft orange ambient glow in bottom right corner (as seen in screenshot) */}
-      <div
-        className="pointer-events-none absolute -bottom-16 -right-16 h-72 w-72 rounded-full bg-gradient-to-tl from-[#FF500D]/15 via-[#FF780C]/8 to-transparent blur-3xl"
-        aria-hidden="true"
-      />
+      </div>
     </section>
   );
 }

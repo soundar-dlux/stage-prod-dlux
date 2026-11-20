@@ -6,10 +6,6 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import ImageLRComponents from "@/src/components/ui/WB-Components/imageLRComponenets";
 
-/* =========================================================
-   TYPES
-========================================================= */
-
 export interface TabItem {
   id: string;
   label: string;
@@ -19,10 +15,6 @@ export interface TabItem {
   highlights?: string[];
   badge?: string;
 }
-
-/* =========================================================
-   TABS DATA
-========================================================= */
 
 const tabsData: TabItem[] = [
   {
@@ -63,9 +55,23 @@ const tabsData: TabItem[] = [
   },
 ];
 
-/* =========================================================
-   MAIN COMPONENT
-========================================================= */
+const contentVariants = {
+  initial: {
+    opacity: 0,
+    y: 22,
+    filter: "blur(5px)",
+  },
+  animate: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+  },
+  exit: {
+    opacity: 0,
+    y: -18,
+    filter: "blur(4px)",
+  },
+};
 
 export function WhyChooseDluxSection() {
   const [activeTab, setActiveTab] = useState<string>("partner");
@@ -77,41 +83,37 @@ export function WhyChooseDluxSection() {
   const currentTab =
     tabsData.find((tab) => tab.id === activeTab) || tabsData[0];
 
-  /* =====================================================
-     TAB CLICK HANDLER
-  ===================================================== */
-
   const handleTabClick = (id: string) => {
+    if (id === activeTab) return;
+
     setActiveTab(id);
 
-    tabRefs.current[id]?.scrollIntoView({
-      behavior: "smooth",
-      block: "nearest",
-      inline: "center",
+    requestAnimationFrame(() => {
+      tabRefs.current[id]?.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "center",
+      });
     });
   };
 
-  /* =====================================================
-     JSX
-  ===================================================== */
-
   return (
-    <section className="relative w-full bg-white py-[40px] overflow-hidden font-sans">
+    <section className="relative w-full overflow-hidden bg-white py-10 sm:py-14 lg:py-16 font-sans">
+      <div className="relative mx-auto max-w-full px-4 sm:px-6 lg:px-8">
 
-      <div className="relative max-w-full mx-auto px-4 sm:px-6 lg:px-8">
-
-        {/* =================================================
-            HEADER AREA
-        ================================================= */}
+        {/* HEADER */}
 
         <motion.div
           initial={{ opacity: 0, y: 25 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center max-w-4xl mx-auto mb-10 sm:mb-12"
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{
+            duration: 0.7,
+            ease: [0.22, 1, 0.36, 1],
+          }}
+          className="mx-auto mb-10 max-w-4xl text-center sm:mb-12"
         >
-          <h2 className="text-3xl sm:text-4xl lg:text-[46px] font-extrabold tracking-tight text-black lg:leading-tight mb-5">
+          <h2 className="mb-5 text-3xl font-extrabold tracking-tight text-black sm:text-4xl lg:text-[46px] lg:leading-tight">
             Why{" "}
             <span className="text-[#FF4F00]">
               Clients choose DLUX
@@ -120,7 +122,7 @@ export function WhyChooseDluxSection() {
             <br className="hidden sm:inline" /> Adobe Partner
           </h2>
 
-          <p className="text-gray-500 text-sm sm:text-[15px] leading-relaxed font-normal max-w-3xl mx-auto">
+          <p className="mx-auto max-w-3xl text-sm font-normal leading-relaxed text-gray-500 sm:text-[15px]">
             Adobe Experience Platform is the foundation your customer
             experience strategy is built on. Get the architecture,
             identity, and governance right from the start, and it scales
@@ -133,21 +135,13 @@ export function WhyChooseDluxSection() {
           </p>
         </motion.div>
 
-        {/* =================================================
-            ZIGZAG TAB NAVIGATION
-        ================================================= */}
+        {/* TAB NAVIGATION */}
 
-        <div className="w-full flex flex-col items-center">
-
-          <div className="w-full flex items-center justify-start sm:justify-center overflow-x-auto scrollbar-hide px-2">
-
-            <div className="flex items-center min-w-max">
-
+        <div className="flex w-full flex-col items-center">
+          <div className="scrollbar-hide flex w-full items-center justify-start overflow-x-auto px-2 sm:justify-center">
+            <div className="flex min-w-max items-center">
               {tabsData.map((tab, index) => {
                 const isActive = activeTab === tab.id;
-
-                // Even tabs: Top line
-                // Odd tabs: Bottom line
                 const isTopLine = index % 2 === 0;
 
                 return (
@@ -159,33 +153,24 @@ export function WhyChooseDluxSection() {
                     onClick={() => handleTabClick(tab.id)}
                     aria-pressed={isActive}
                     className={`
-                      relative
-                      w-[329.5px]
-                      h-[65px]
-                      flex items-center justify-center
-                      bg-white
-                      gap-[10px]
-                      px-6
-                      font-bold text-sm sm:text-base
-                      transition-colors duration-300
+                      relative flex h-[65px] w-[260px] items-center
+                      justify-center gap-2.5 overflow-hidden
+                      border border-gray-200 bg-white px-5
+                      text-sm font-bold transition-colors
+                      duration-300 sm:w-[329.5px] sm:text-base
                       cursor-pointer select-none
-                      border border-gray-200
-                      overflow-hidden
 
                       ${isTopLine ? "border-t-0" : "border-b-0"}
 
-                      ${index > 0 ? "-ml-[1px]" : ""}
+                      ${index > 0 ? "-ml-px" : ""}
 
                       ${isActive
-                        ? "bg-white text-[#FF4F00] border-gray-300 z-10"
-                        : "bg-gray-50/70 text-gray-700 hover:text-[#FF4F00] hover:bg-white"
+                        ? "z-10 text-[#FF4F00] border-gray-300"
+                        : "bg-gray-50/70 text-gray-700 hover:bg-white hover:text-[#FF4F00]"
                       }
                     `}
                   >
-
-                    {/* =================================
-                        ACTIVE ZIGZAG LINE
-                    ================================= */}
+                    {/* ANIMATED ACTIVE LINE */}
 
                     {isActive && (
                       <motion.span
@@ -197,15 +182,9 @@ export function WhyChooseDluxSection() {
                           damping: 38,
                         }}
                         className={`
-                          absolute
-                          left-0
-                          right-0
-                          h-[3px]
+                          absolute left-0 right-0 h-[3px]
                           bg-[#FF4F00]
-                          ${isTopLine
-                            ? "top-0"
-                            : "bottom-0"
-                          }
+                          ${isTopLine ? "top-0" : "bottom-0"}
                         `}
                       />
                     )}
@@ -215,87 +194,64 @@ export function WhyChooseDluxSection() {
                     <span className="relative z-10">
                       {tab.label}
                     </span>
-
                   </button>
                 );
               })}
-
             </div>
-
           </div>
-
         </div>
 
-        {/* =================================================
-            TAB CONTENT
-        ================================================= */}
+        {/* TAB CONTENT */}
 
-        <AnimatePresence mode="wait">
-
-          <motion.div
-            key={activeTab}
-            initial={{
-              opacity: 0,
-              y: 15,
-            }}
-            animate={{
-              opacity: 1,
-              y: 0,
-            }}
-            exit={{
-              opacity: 0,
-              y: -15,
-            }}
-            transition={{
-              duration: 0.35,
-              ease: "easeOut",
-            }}
-            className="w-full mx-auto bg-white"
-          >
-
-            <ImageLRComponents
-              title={
-                <span
-                  style={{
-                    background:
-                      "linear-gradient(90deg, #FE780C 0%, #FE3908 100%)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                  }}
-                  className="font-extrabold inline-block p-[5px]"
-                >
-                  {currentTab.heading}
-                </span>
-              }
-
-              badge={currentTab.badge}
-
-              description={currentTab.description}
-
-              features={currentTab.highlights}
-
-              bgVariant="white"
-
-              imagePosition="left"
-
-              imageSrc={currentTab.imageSrc}
-
-              imageAlt={currentTab.heading}
-
-              disableImageHover={true}
-
-              showContentTopLine={false}
-              showSectionBottomLine={false}
-
-              className="py-0 px-0 bg-white [&_img]:!transform-none [&_img]:!scale-100"
-            />
-
-          </motion.div>
-
-        </AnimatePresence>
+        <div className="relative mt-5 w-full sm:mt-8">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={activeTab}
+              variants={contentVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              transition={{
+                duration: 0.45,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+              className="mx-auto w-full bg-white"
+            >
+              <ImageLRComponents
+                title={
+                  <span
+                    style={{
+                      background:
+                        "linear-gradient(90deg, #FE780C 0%, #FE3908 100%)",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                    }}
+                    className="inline-block p-[5px] font-extrabold"
+                  >
+                    {currentTab.heading}
+                  </span>
+                }
+                badge={currentTab.badge}
+                description={currentTab.description}
+                features={currentTab.highlights}
+                bgVariant="white"
+                imagePosition="left"
+                imageSrc={currentTab.imageSrc}
+                imageAlt={currentTab.heading}
+                disableImageHover={true}
+                showContentTopLine={false}
+                showSectionBottomLine={false}
+                className="
+                  bg-white px-0 py-0
+                  [&_img]:!transform-none
+                  [&_img]:!scale-100
+                "
+              />
+            </motion.div>
+          </AnimatePresence>
+        </div>
 
       </div>
-
     </section>
   );
 }

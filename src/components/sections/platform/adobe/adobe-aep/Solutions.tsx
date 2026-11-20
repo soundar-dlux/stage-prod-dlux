@@ -117,10 +117,9 @@ export function SolutionsSection() {
         >
           <h2 className="text-3xl sm:text-4xl lg:text-[46px] font-extrabold text-black tracking-tight lg:leading-tight">
             The Solution Behind{" "}
+            <br className="hidden sm:inline" />
             <span className="text-[#FF4F00]">
-              Real-
-              <br className="hidden sm:inline" />
-              Time Experiences
+              Real Time Experiences
             </span>
           </h2>
         </motion.div>

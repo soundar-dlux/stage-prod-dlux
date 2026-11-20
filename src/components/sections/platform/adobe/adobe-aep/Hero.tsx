@@ -34,11 +34,11 @@ export default function HeroBanner() {
                         style={{
                             background: "linear-gradient(90deg, #FE780C 0%, #FE3908 100%)",
                         }}
-                        className="absolute inset-x-0 bottom-0 mx-auto w-full max-w-[1200px] h-[220px] sm:h-[300px] lg:h-[362px] rounded-[30px] opacity-100 rotate-0 shadow-xl shadow-[#FE3908]/25 z-0"
+                        className="absolute inset-x-0 bottom-0 mx-auto w-full max-w-[1200px] h-[220px] sm:h-[300px] lg:h-[362px] rounded-[30px] opacity-100 rotate-0 z-0"
                     />
 
                     {/* DESKTOP SCREEN MOCKUP (lg:block) */}
-                    <div className="relative z-10 hidden lg:block w-[907px] max-w-[95%] rounded-t-[24px] bg-[#000000] p-2 pb-0 shadow-2xl border-t-2 border-x-2 border-white/15 overflow-hidden">
+                    <div className="relative z-10 hidden lg:block w-[907px] max-w-[95%] rounded-t-[24px] bg-[#000000] p-2 pb-0 border-t-2 border-x-2 border-white/15 overflow-hidden">
                         <div className="relative aspect-[16/9.5] w-full bg-[#050508] rounded-t-[18px] overflow-hidden">
                             <video
                                 className="h-full w-full object-cover object-center"
