@@ -2,6 +2,7 @@ import React from "react";
 import ServiceProcess, {
   ProcessStep,
 } from "@/src/components/WB-Component/Section/ServiceProcess";
+import HorizontalLine from "@/src/components/WB-Component/Line/HorizontalLine";
 
 const bynderProcessSteps: ProcessStep[] = [
   {
@@ -35,7 +36,8 @@ const bynderProcessSteps: ProcessStep[] = [
 ];
 
 export default function BynderServicesSection() {
-  return (
+ return (
+  <>
     <ServiceProcess
       highlightText="DLUX"
       title="+ Bynder Services"
@@ -44,6 +46,8 @@ export default function BynderServicesSection() {
       imageSrc="https://images.ctfassets.net/pj0maraabon4/6AOKsOk9Ynd1L2jIBlLyZQ/253d1cec53705c18fa8d8508100b2d65/Four-Stage_Orange_Workflow_Infographic-Photoroom_1.svg"
       imageAlt="DLUX + Bynder 4-stage services approach: Discover, Design, Deliver, and Optimize"
     />
-  );
+ 
+  </>
+);
 }
 

@@ -58,7 +58,7 @@ export default function HeroBanner({
             for <span className="text-[#FF571C]">Your Brand</span>
           </h1>
 
-          <p className="mt-5 max-w-[430px] text-sm leading-[1.55] text-[#555555] sm:text-base">
+          <p className="mt-5 max-w-[430px] text-lg leading-[1.55] text-[#555555] ">
             Bynder gives your teams one place to find, manage and deliver
             content, and DLUX helps you set it up so the brand stays consistent
             across every market you operate in.

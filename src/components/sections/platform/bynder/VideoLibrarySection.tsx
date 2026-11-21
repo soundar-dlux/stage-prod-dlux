@@ -31,7 +31,7 @@ export default function VideoLibrarySection() {
   const [activeVideo, setActiveVideo] = useState<VideoItem | null>(null);
 
   return (
-    <section ref={sectionRef} className="relative bg-white py-16 sm:py-20 lg:py-24">
+    <section ref={sectionRef} className="relative bg-white py-16 sm:py-20 lg:py-10">
       <div className="mx-auto max-w-[1240px] px-6 sm:px-8">
         {/* Header */}
         <motion.div

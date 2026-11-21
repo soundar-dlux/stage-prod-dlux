@@ -39,7 +39,7 @@ export function ConsultationCTA({
         background:
           "linear-gradient(182.02deg, #000000 1.7%, #FE3908 221.82%)",
       }}
-      className={`w-full min-h-[504px] pt-[80px] pb-[80px] px-4 sm:px-8 lg:pt-[80px] lg:pr-[80px] lg:pb-[80px] lg:pl-[81px] text-white text-center font-sans overflow-hidden relative flex flex-col justify-center items-center ${className}`}
+      className={`w-full min-h-[504px] pt-[80px] pb-[80px] px-4 sm:px-8 lg:pt-[80px] lg:pr-[80px] lg:pb-[80px] lg:pl-[81px] text-white text-center font-sans overflow-hidden relative flex flex-col justify-center items-center lg:py-10 ${className}`}
     >
       <div className="max-w-5xl mx-auto relative z-10 flex flex-col items-center gap-[10px]">
         {/* Heading */}

@@ -59,7 +59,7 @@ export default function FAQSection({
 
   return (
     <section
-      className={`relative w-full py-16 sm:py-20 lg:py-24 overflow-hidden ${className}`}
+      className={`relative w-full py-16 sm:py-20 lg:py-10 overflow-hidden ${className}`}
       style={{
         background:
           "radial-gradient(circle at 0% 100%, rgba(255, 235, 225, 0.45) 0%, transparent 45%), radial-gradient(circle at 100% 100%, rgba(255, 235, 225, 0.45) 0%, transparent 45%), #FFFFFF",

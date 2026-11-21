@@ -25,6 +25,7 @@ export default function Bynder() {
         imageSrc="https://images.ctfassets.net/pj0maraabon4/2Dwq6QG200xVyBGHr4CAok/47e8958fc42a68f539b3c81bf45b0eef/Group_2264.svg"
         imageAlt="Bynder Overview Dashboard Showcase"
         showSectionBottomLine
+  showTopLine={false}
         bgVariant="white"
       />
       <WhatYouGainSection />

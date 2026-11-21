@@ -54,7 +54,7 @@ const BLFeatureCard: React.FC<FeatureCardProps> = ({
             </div>
 
             {/* Content */}
-            <div className="mt-auto pt-4">
+            <div className="pt-4">
                 <h3 className="mb-3.5 text-[20px] font-semibold leading-[1.35] tracking-tight text-[#FF500D]">
                     {title}
                 </h3>

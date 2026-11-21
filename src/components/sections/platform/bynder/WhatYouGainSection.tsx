@@ -61,17 +61,18 @@ export default function WhatYouGainSection() {
   const isInView = useInView(sectionRef, { once: true, amount: 0.15 });
 
   return (
-    <section ref={sectionRef} className="relative bg-white  py-8 sm:py-10 lg:py-8">
+    <section ref={sectionRef}   className="relative bg-[linear-gradient(180.82deg,#FFFFFF_0.71%,#FE3908_1031.19%)] py-8 sm:py-10 lg:py-10"
+>
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 25 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
-          className="mx-auto max-w-3xl text-center"
+          className="mx-auto max-w-4xl text-center"
         >
           {/* Note / Tagline */}
-          <p className="mb-3 text-xs sm:text-sm font-medium text-[#FF500D]">
+          <p className="mb-[20px] text-lg font-medium text-[#FF500D]">
             Feature availability depends on the Bynder modules and package enabled for your account.
           </p>
 
@@ -82,7 +83,7 @@ export default function WhatYouGainSection() {
           </h2>
 
           {/* Subheading */}
-          <p className="mt-4 text-base leading-relaxed text-[#555555] sm:text-lg">
+          <p className="mt-5 text-base leading-relaxed text-[#555555] sm:text-lg">
             Getting the most out of Bynder DAM starts with the right features, effective configuration,
             and team adoption. That's where the right strategy makes a difference.
           </p>
