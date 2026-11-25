@@ -18,22 +18,22 @@ export const defaultBynderFaqs: FaqItem[] = [
   {
     question: "Can Bynder connect to the tools we already use?",
     answer:
-      "Yes. Bynder connects with over 150 prebuilt marketplace integrations including Adobe Workfront, Figma, Asana, and monday.com. For tools without native connectors, DLUX designs custom integrations via Bynder's API or integration platforms like Boomi.",
+      "In most cases, yes. The Bynder Marketplace covers many common marketing and work-management tools, and where a connector doesn't exist, we can scope a custom integration through Bynder's API. ",
   },
   {
     question: "Do we need to migrate all our assets at once?",
     answer:
-      "No. We often recommend a phased migration approach—starting with high-priority active brand assets and campaign materials, before migrating legacy archives. This ensures faster time-to-value without overwhelming your team.",
+      "Not necessarily. Many organizations begin with their most-used or highest-value content and move the rest in phases, which also creates a natural opportunity to retire outdated material.",
   },
   {
     question: "We already have a DAM. Can you help us move to Bynder?",
     answer:
-      "Yes. We specialize in legacy DAM migrations. We help audit your existing taxonomy, clean up redundant or outdated files, map metadata schemes, and securely migrate your assets into Bynder with minimal disruption to ongoing operations.",
+      "Yes. We assess your current setup and plan the transition, including how your existing metadata and folder structures should be mapped across or redesigned. ",
   },
   {
     question: "Do you only work with organizations in APAC?",
     answer:
-      "While we have deep expertise supporting regional nuances across APAC, we work with global enterprises worldwide, helping multinational teams harmonize global brand standards with localized market requirements.",
+      "Much of our work is in APAC, but we support organizations in other regions as well. ",
   },
 ];
 

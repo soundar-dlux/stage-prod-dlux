@@ -1,3 +1,3 @@
-export { default } from "./ConsultationCTA";
-export * from "./ConsultationCTA";
+export { default } from "../../../sections/platform/bynder/ConsultationCTA";
+export * from "../../../sections/platform/bynder/ConsultationCTA";
 

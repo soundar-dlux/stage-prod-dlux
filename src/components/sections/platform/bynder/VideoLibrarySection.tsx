@@ -4,6 +4,7 @@ import React, { useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
 import { Play, ArrowRight, X } from "lucide-react";
 import Link from "next/link";
+import InfoNotice from "@/src/components/WB-Component/InfoNotice";
 
 interface VideoItem {
   id: string;
@@ -31,7 +32,7 @@ export default function VideoLibrarySection() {
   const [activeVideo, setActiveVideo] = useState<VideoItem | null>(null);
 
   return (
-    <section ref={sectionRef} className="relative bg-white py-16 sm:py-20 lg:py-10">
+    <section ref={sectionRef} className="relative bg-white pt-[30px] pb-[30px]">
       <div className="mx-auto max-w-[1240px] px-6 sm:px-8">
         {/* Header */}
         <motion.div
@@ -42,7 +43,7 @@ export default function VideoLibrarySection() {
         >
           <h2 className="text-3xl font-extrabold tracking-tight text-[#111111] sm:text-4xl md:text-5xl">
             Bynder Implementation{" "}
-            <span className="text-[#FF500D]">Video Library</span>
+            <span className="bg-gradient-to-r from-subGradientText-from to-subGradientText-to bg-clip-text text-transparent">Video Library</span>
           </h2>
 
           <p className="mt-4 text-base leading-relaxed text-[#555555] sm:text-lg">
@@ -91,22 +92,13 @@ export default function VideoLibrarySection() {
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className="mt-10 sm:mt-12 flex items-center justify-center"
+          className="w-full flex justify-center items-center pt-[30px] pb-[60px]"
         >
-          <div className="flex items-center gap-3 text-center sm:text-left">
-            <div className="flex-shrink-0">
-              <div className="flex h-6 w-6 items-center justify-center rounded-full border-[1.8px] border-[#FF500D] text-[#FF500D]">
-                <span className="text-xs font-bold leading-none">i</span>
-              </div>
-            </div>
-            <p className="text-xs sm:text-sm leading-relaxed text-[#555555]">
-              <span className="font-semibold text-[#FF500D]">
-                Can't find what you need?
-              </span>{" "}
-              If your situation is different, our team can talk you through how
-              we would approach it.
-            </p>
-          </div>
+          <InfoNotice
+            message="Can't find what you need? If your situation is different, our team can walk you through how we would approach it."
+            highlightedText="Can't find what you need?"
+            className="!w-fit !mx-auto"
+          />
         </motion.div>
       </div>
 

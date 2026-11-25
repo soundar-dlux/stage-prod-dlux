@@ -1,8 +1,11 @@
+
 "use client";
 
 import React from "react";
 import { motion } from "framer-motion";
 import { ArrowDownCircle } from "lucide-react";
+import PrimaryButton from "@/src/components/WB-Component/Buttons/PrimaryButton";
+import Image from "next/image";
 
 export interface AepCtaSectionProps {
   title?: React.ReactNode;
@@ -17,7 +20,8 @@ export function ConsultationCTA({
   title = (
     <>
       Let's talk about your{" "}
-      <span className="text-[#FF4F00]">DAM priorities.</span>
+      <span className="bg-gradient-to-r from-subGradientText-from to-subGradientText-to bg-clip-text text-transparent">
+        DAM priorities.</span>
     </>
   ),
   description = "Whether you are evaluating Bynder for the first time or rethinking an existing DAM, an initial conversation with our consultants is the best place to start. We'll look at how content moves through your organization today, where the friction sits, and what a Bynder implementation would need to address. Where it helps, we'll follow up with a demonstration shaped around your own workflows.",
@@ -26,21 +30,16 @@ export function ConsultationCTA({
   onButtonClick,
   className = "",
 }: AepCtaSectionProps) {
-  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleClick = () => {
     if (onButtonClick) {
-      e.preventDefault();
       onButtonClick();
+    } else if (buttonHref) {
+      window.location.assign(buttonHref);
     }
   };
 
   return (
-    <section
-      style={{
-        background:
-          "linear-gradient(182.02deg, #000000 1.7%, #FE3908 221.82%)",
-      }}
-      className={`w-full min-h-[504px] pt-[80px] pb-[80px] px-4 sm:px-8 lg:pt-[80px] lg:pr-[80px] lg:pb-[80px] lg:pl-[81px] text-white text-center font-sans overflow-hidden relative flex flex-col justify-center items-center lg:py-10 ${className}`}
-    >
+    <section className="relative bg-[linear-gradient(182.02deg,#000000_1.7%,#FE3908_221.82%)] p-20 mt-[30px] mb-[30px]">
       <div className="max-w-5xl mx-auto relative z-10 flex flex-col items-center gap-[10px]">
         {/* Heading */}
         <motion.h2
@@ -59,35 +58,35 @@ export function ConsultationCTA({
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="text-white/85 text-sm sm:text-base leading-relaxed max-w-3xl mx-auto mb-6 font-normal"
+          className="text-white/85 text-sm sm:text-base leading-relaxed max-w-5xl mx-auto mb-6 font-normal text-center"
         >
           {description}
         </motion.p>
 
-        {/* Single CTA Button */}
+        {/* Primary CTA Button */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="flex items-center justify-center mt-2"
+          className="mt-2 flex items-center justify-center"
         >
-          <motion.a
+          <PrimaryButton
             href={buttonHref}
             onClick={handleClick}
-            whileHover={{ scale: 1.04 }}
-            whileTap={{ scale: 0.96 }}
-            className="
-              inline-flex items-center gap-3
-              bg-white text-[#FE3908] font-bold text-sm sm:text-base
-              px-7 py-3.5 rounded-full
-              shadow-lg shadow-black/20 hover:shadow-xl
-              transition-all duration-300 cursor-pointer select-none no-underline
-            "
+            icon={true}
+            customIcon={
+              <Image
+                src="https://images.ctfassets.net/pj0maraabon4/1E9qiHsYodL6QNs5NIVS5R/c1135dc33e6dbcb9a201619ad5f4eb98/Layer_1__10_.svg"
+                alt="Arrow"
+                width={20}
+                height={20}
+                className="h-5 w-5 object-contain"
+              />
+            }
           >
-            <ArrowDownCircle className="w-5 h-5 text-[#FE3908] stroke-[2.2]" />
-            <span>{buttonText}</span>
-          </motion.a>
+            {buttonText}
+          </PrimaryButton>
         </motion.div>
       </div>
     </section>

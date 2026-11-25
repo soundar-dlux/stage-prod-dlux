@@ -1,23 +1,33 @@
+
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { motion } from "framer-motion";
 
 export interface PrimaryButtonProps {
   /** Button label or React node */
   children: React.ReactNode;
-  /** Click handler function */
-  onClick?: (e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => void;
-  /** Optional link URL (renders as <a> tag if provided) */
+
+  /** Click handler */
+  onClick?: (
+    e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>
+  ) => void;
+
+  /** Optional link URL */
   href?: string;
-  /** Additional CSS class names */
+
+  /** Additional CSS classes */
   className?: string;
-  /** Whether to display right arrow icon (default: true) */
+
+  /** Whether to display an icon */
   icon?: boolean;
-  /** Custom icon component override */
+
+  /** Custom icon or image component */
   customIcon?: React.ReactNode;
-  /** Button type if rendered as button element */
+
+  /** Button type */
   type?: "button" | "submit" | "reset";
+
   /** Disabled state */
   disabled?: boolean;
 }
@@ -32,72 +42,128 @@ export function PrimaryButton({
   type = "button",
   disabled = false,
 }: PrimaryButtonProps) {
-  const [isHovered, setIsHovered] = useState(false);
-
   const buttonContent = (
-    <motion.div
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
-      whileHover={{ scale: disabled ? 1 : 1.04, y: disabled ? 0 : -2 }}
-      whileTap={{ scale: disabled ? 1 : 0.96 }}
+    <motion.span
+      whileHover={
+        !disabled
+          ? {
+              y: -2,
+            }
+          : {}
+      }
+      whileTap={
+        !disabled
+          ? {
+              scale: 0.98,
+            }
+          : {}
+      }
+      transition={{
+        type: "spring",
+        stiffness: 300,
+        damping: 22,
+      }}
       className={`
-        relative inline-flex items-center justify-center gap-2.5
+        group relative isolate inline-flex items-center justify-center gap-2.5
         min-h-[48px] px-7 py-3.5 rounded-full
         font-bold text-sm sm:text-base tracking-wide text-white
-        overflow-hidden cursor-pointer select-none
-        transition-all duration-300 shadow-lg shadow-[#FE3908]/30
-        wb-primary-btn bg-gradient-to-r from-[#FE780C] to-[#FE3908]
-        focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80
-        ${disabled ? "opacity-50 cursor-not-allowed pointer-events-none" : ""}
+        overflow-hidden select-none
+        shadow-lg shadow-[#FE3908]/30
+        wb-primary-btn
+        bg-gradient-to-r from-[#FE780C] to-[#FE3908]
+        transition-[box-shadow,background-color] duration-500 ease-out
+        ${disabled
+          ? "opacity-50 cursor-not-allowed"
+          : "cursor-pointer hover:shadow-xl hover:shadow-[#FE3908]/40"
+        }
         ${className}
       `}
     >
-      {/* 🌟 Continuous Shimmer Beam */}
+      {/* Smooth Hover Background */}
       <motion.span
+        aria-hidden="true"
+        className="absolute inset-0 -z-10 rounded-full"
+        initial={{ opacity: 0 }}
+        whileHover={!disabled ? { opacity: 1 } : {}}
+        transition={{ duration: 0.4, ease: "easeInOut" }}
+        style={{
+          background:
+            "linear-gradient(110deg, #FF9A20 0%, #FE3908 55%, #FF6A00 100%)",
+        }}
+      />
+
+      {/* Continuous Shimmer */}
+      <motion.span
+        aria-hidden="true"
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "linear-gradient(120deg, transparent 20%, rgba(255, 255, 255, 0.4) 50%, transparent 80%)",
+            "linear-gradient(120deg, transparent 20%, rgba(255,255,255,0.35) 50%, transparent 80%)",
         }}
-        animate={{
-          transform: ["translateX(-150%)", "translateX(150%)"],
-        }}
+        animate={
+          disabled
+            ? {}
+            : {
+                x: ["-150%", "150%"],
+              }
+        }
         transition={{
-          duration: 2.4,
+          duration: 2.8,
           repeat: Infinity,
           ease: "easeInOut",
           repeatDelay: 1.5,
         }}
       />
 
-      {/* 💎 Subtle Inner Top Light Highlight */}
-      <span className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-white/50 to-transparent opacity-80" />
+      {/* Top Highlight */}
+      <span
+        aria-hidden="true"
+        className="
+          absolute inset-x-0 top-0 h-px
+          bg-gradient-to-r from-transparent
+          via-white/50 to-transparent
+          pointer-events-none
+        "
+      />
 
-      {/* Button Text */}
-      <span className="relative z-10">{children}</span>
-
-      {/* Icon */}
-      {icon && (
-        <motion.span
-          className="relative z-10 flex items-center justify-center"
-          animate={isHovered ? { x: 4 } : { x: 0 }}
-          transition={{ duration: 0.2, ease: "easeOut" }}
+      {/* Icon - No Hover Animation */}
+      {icon && customIcon && (
+        <span
+          aria-hidden="true"
+          className="relative z-10 flex shrink-0 items-center justify-center"
         >
-        </motion.span>
+          {customIcon}
+        </span>
       )}
-    </motion.div>
+
+      {/* Content - No Hover Animation */}
+      <span className="relative z-10">
+        {children}
+      </span>
+    </motion.span>
   );
 
   if (href) {
     return (
-      <a href={href} onClick={onClick} className="inline-block">
+      <a
+        href={disabled ? undefined : href}
+        onClick={disabled ? undefined : onClick}
+        aria-disabled={disabled || undefined}
+        tabIndex={disabled ? -1 : undefined}
+        className="inline-flex"
+      >
         {buttonContent}
       </a>
     );
   }
 
   return (
-    <button type={type} onClick={onClick} disabled={disabled} className="inline-block">
+    <button
+      type={type}
+      onClick={onClick}
+      disabled={disabled}
+      className="inline-flex"
+    >
       {buttonContent}
     </button>
   );

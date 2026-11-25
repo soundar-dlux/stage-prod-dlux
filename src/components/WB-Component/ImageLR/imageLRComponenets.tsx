@@ -76,7 +76,7 @@ export interface ImageLRComponentsProps {
 export function ImageLRComponents({
   title,
   highlightText,
-  highlightColor = "text-brand-primary",
+  highlightColor = "bg-gradient-to-r from-subGradientText-from to-subGradientText-to bg-clip-text text-transparent",
   badge,
   description,
   features = [],
@@ -317,8 +317,8 @@ export function ImageLRComponents({
   ===================================================== */
 
   return (
-    <section
-      className={`w-full py-12 sm:py-16 md:py-20 lg:py-[40px] px-4 sm:px-6 lg:px-8 transition-colors duration-300 ${bgStyles[bgVariant]} ${className}`}
+    <div
+      className={`w-full transition-colors duration-300 ${bgStyles[bgVariant]} ${className}`}
       data-testid="image-lr-component"
     >
       <div className="max-w-7xl mx-auto">
@@ -561,7 +561,7 @@ export function ImageLRComponents({
         {shouldShowBottomLine && <HorizontalLine className="mt-[40px]" />}
 
       </div>
-    </section>
+    </div>
   );
 }
 

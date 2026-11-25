@@ -30,8 +30,8 @@ export default function ServiceProcess({
   className = "",
 }: ServiceProcessProps) {
   return (
-    <section
-      className={`w-full bg-white py-16 md:py-20 lg:py-10 ${className}`}
+    <div
+      className={`${className}`}
     >
       <div className="mx-auto max-w-[1240px] px-6 sm:px-8">
 
@@ -42,7 +42,7 @@ export default function ServiceProcess({
           <div className="w-full">
             <h2 className="mb-4 text-4xl font-extrabold leading-tight tracking-tight text-black sm:text-4xl lg:text-[42px]">
               {highlightText && (
-                <span className="text-[#FF500D]">
+                <span className="bg-gradient-to-r from-subGradientText-from to-subGradientText-to bg-clip-text text-transparent">
                   {highlightText}
                 </span>
               )}
@@ -66,7 +66,7 @@ export default function ServiceProcess({
                   </span>
 
                   <p className="text-[13px] leading-relaxed text-[#555555] sm:text-[14px]">
-                    <span className="font-semibold text-[#FF500D]">
+                    <span className="font-semibold bg-gradient-to-r from-subGradientText-from to-subGradientText-to bg-clip-text text-transparent">
                       {step.title}:
                     </span>{" "}
 
@@ -106,6 +106,6 @@ export default function ServiceProcess({
         </div>
 
       </div>
-    </section>
+    </div>
   );
 }

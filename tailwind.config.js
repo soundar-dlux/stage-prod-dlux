@@ -34,6 +34,8 @@ module.exports = {
           transparent: "transparent",
         },
       },
+     
+
 
       fontFamily: {
         sans: ["var(--font-open-sans)", "sans-serif"], // DEFAULT FONT

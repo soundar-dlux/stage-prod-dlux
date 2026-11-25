@@ -5,6 +5,7 @@ import React, { useRef } from "react";
 import Image from "next/image";
 import { motion, useInView } from "framer-motion";
 import WbCard from "@/src/components/WB-Component/Cards/WbCard";
+import InfoNotice from "@/src/components/WB-Component/InfoNotice";
 
 export default function IntegrationOptionsSection() {
   const sectionRef = useRef<HTMLDivElement | null>(null);
@@ -23,7 +24,7 @@ export default function IntegrationOptionsSection() {
   return (
     <section
       ref={sectionRef}
-      className="relative bg-[linear-gradient(180.82deg,#FFFFFF_0.71%,#FE3908_1031.19%)] py-16 sm:py-20 lg:py-10"
+      className="relative bg-[linear-gradient(180.82deg,#FFFFFF_0.71%,#FE3908_1031.19%)] mt-[30px] mb-[30px]"
     >
       <div className="mx-auto max-w-[1240px] px-6 sm:px-8 ">
 
@@ -36,7 +37,7 @@ export default function IntegrationOptionsSection() {
         >
           <h2 className="text-3xl font-extrabold tracking-tight text-[#111111] sm:text-4xl md:text-5xl">
             Integration{" "}
-            <span className="text-[#FF500D]">Options</span>
+            <span className="bg-gradient-to-r from-subGradientText-from to-subGradientText-to bg-clip-text text-transparent">Options</span>
           </h2>
         </motion.div>
 
@@ -126,21 +127,15 @@ export default function IntegrationOptionsSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className="mt-8 flex items-start gap-3 px-1 sm:mt-10 sm:px-2"
+          className="w-full pt-[30px] pb-[30px]"
         >
-          <div className="mt-0.5 flex-shrink-0">
-            <div className="flex h-6 w-6 items-center justify-center rounded-full border-[1.8px] border-[#FF500D] text-[#FF500D]">
-              <span className="text-xs font-bold leading-none">i</span>
-            </div>
-          </div>
-
-          <p className="text-xs leading-relaxed text-[#555555] sm:text-sm">
-            Connector availability, licensing, permissions and
-            supported fields vary by account and configuration, so
-            we confirm what is possible for your environment during
-            the Discover stage.
-          </p>
+          <InfoNotice
+            isInView={isInView}
+            message="Connector availability, licensing, permissions and supported fields vary by account and configuration, so we confirm what is possible for your environment 
+during the Discover stage."
+          />
         </motion.div>
+
 
       </div>
     </section>

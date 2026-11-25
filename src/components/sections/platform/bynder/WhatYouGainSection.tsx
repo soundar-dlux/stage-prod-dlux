@@ -3,6 +3,8 @@
 import React, { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import BLFeatureCard from "@/src/components/WB-Component/Cards/BL-Cards";
+import Image from "next/image";
+import InfoNotice from "@/src/components/WB-Component/InfoNotice";
 
 interface BynderFeatureItem {
   title: string;
@@ -61,9 +63,13 @@ export default function WhatYouGainSection() {
   const isInView = useInView(sectionRef, { once: true, amount: 0.15 });
 
   return (
-    <section ref={sectionRef}   className="relative bg-[linear-gradient(180.82deg,#FFFFFF_0.71%,#FE3908_1031.19%)] py-8 sm:py-10 lg:py-10"
->
+
+    <section
+      ref={sectionRef}
+      className="relative bg-[linear-gradient(180.82deg,#FFFFFF_0.71%,#FE3908_1031.19%)] mt-[30px] mb-[30px] "
+    >
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
+
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 25 }}
@@ -71,26 +77,21 @@ export default function WhatYouGainSection() {
           transition={{ duration: 0.6 }}
           className="mx-auto max-w-4xl text-center"
         >
-          {/* Note / Tagline */}
-          <p className="mb-[20px] text-lg font-medium text-[#FF500D]">
-            Feature availability depends on the Bynder modules and package enabled for your account.
-          </p>
 
-          {/* Heading */}
           <h2 className="text-3xl font-bold tracking-tight text-[#111111] sm:text-4xl md:text-5xl">
             What You Gain with{" "}
-            <span className="text-[#FF500D]">Bynder DAM</span>
+            <span className="bg-gradient-to-r from-subGradientText-from to-subGradientText-to bg-clip-text text-transparent">Bynder DAM</span>
           </h2>
 
-          {/* Subheading */}
           <p className="mt-5 text-base leading-relaxed text-[#555555] sm:text-lg">
-            Getting the most out of Bynder DAM starts with the right features, effective configuration,
-            and team adoption. That's where the right strategy makes a difference.
+            Getting the most out of Bynder DAM starts with the right features,
+            effective configuration, and team adoption. That's where the right
+            strategy makes a difference.
           </p>
         </motion.div>
 
-        {/* Feature Cards Grid (3 columns on desktop, 2 on tablet, 1 on mobile) */}
-        <div className="mt-12 sm:mt-16 grid grid-cols-1 gap-6 sm:gap-7 md:grid-cols-2 lg:grid-cols-3 lg:gap-8">
+        {/* Feature Cards Grid */}
+        <div className="mt-12 grid grid-cols-1 gap-6 sm:mt-16 sm:gap-7 md:grid-cols-2 lg:grid-cols-3 lg:gap-8">
           {featureCards.map((card, index) => (
             <motion.div
               key={card.title}
@@ -108,7 +109,26 @@ export default function WhatYouGainSection() {
             </motion.div>
           ))}
         </div>
+
+        {/* Bottom Information Notice - Center Aligned */}
+
+        {/* Bottom Information Notice - Screen Center */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="w-full flex justify-center items-center pt-[30px] pb-[60px]"
+        >
+          <div className="w-fit max-w-full mx-auto">
+            <InfoNotice
+              isInView={isInView}
+              message="Feature availability depends on the Bynder modules and package enabled for your account."
+              className="!w-fit !mx-auto"
+            />
+          </div>
+        </motion.div>
       </div>
     </section>
+
   );
 }

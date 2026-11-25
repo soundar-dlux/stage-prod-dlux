@@ -234,7 +234,7 @@ export function WbCard({
             <h3
               className={
                 titleClassName ||
-                "text-[#FF4F00] font-extrabold text-2xl sm:text-[32px] leading-none mb-[26px] tracking-tight uppercase"
+                "bg-gradient-to-r from-subGradientText-from to-subGradientText-to bg-clip-text text-transparent font-extrabold text-2xl sm:text-[32px] leading-none mb-[26px] tracking-tight uppercase"
               }
             >
               {title}

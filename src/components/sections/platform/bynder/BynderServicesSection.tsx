@@ -8,13 +8,13 @@ const bynderProcessSteps: ProcessStep[] = [
   {
     number: "01",
     title: "Discover",
-    subtitle: "strategy, workflows and metadata.",
+    subtitle: "Strategy, workflows and metadata.",
     description:
       "We map how content moves through your organization today, then design approval processes, asset lifecycles and taxonomies that balance global brand standards with local market needs.",
   },
   {
-    number: "02",
-    title: "Design",
+      number: "02",
+      title: "Design",
     subtitle: "Bynder modules and governance.",
     description:
       "We configure the Bynder modules you are licensed for, set up role-based access for each team, and align the setup with your privacy, security and data-residency requirements. Configuration supports compliance, though it does not guarantee it on its own.",
@@ -22,14 +22,14 @@ const bynderProcessSteps: ProcessStep[] = [
   {
     number: "03",
     title: "Deliver",
-    subtitle: "migration and integration.",
+    subtitle: "Migration and integration.",
     description:
       "We migrate your existing assets and metadata into Bynder and connect it to the tools your teams already use, through marketplace connectors or custom integrations.",
   },
   {
     number: "04",
     title: "Optimize",
-    subtitle: "adoption and continuous improvement.",
+    subtitle: "Adoption and continuous improvement.",
     description:
       "A DAM only delivers value when people use it well, so we train each team, review usage after go-live, and refine the setup as your needs grow.",
   },
@@ -37,7 +37,7 @@ const bynderProcessSteps: ProcessStep[] = [
 
 export default function BynderServicesSection() {
  return (
-  <>
+  <section className="bg-brand-white pt-[30px] pb-[30px]">
     <ServiceProcess
       highlightText="DLUX"
       title="+ Bynder Services"
@@ -47,7 +47,7 @@ export default function BynderServicesSection() {
       imageAlt="DLUX + Bynder 4-stage services approach: Discover, Design, Deliver, and Optimize"
     />
  
-  </>
+  </section>
 );
 }
 
