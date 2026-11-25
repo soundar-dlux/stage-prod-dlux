@@ -26,7 +26,7 @@ export function ConsultationCTA({
   ),
   description = "Whether you are evaluating Bynder for the first time or rethinking an existing DAM, an initial conversation with our consultants is the best place to start. We'll look at how content moves through your organization today, where the friction sits, and what a Bynder implementation would need to address. Where it helps, we'll follow up with a demonstration shaped around your own workflows.",
   buttonText = "Request a Consultation",
-  buttonHref = "#implementation-guide",
+  buttonHref = "/contact-us",
   onButtonClick,
   className = "",
 }: AepCtaSectionProps) {
